@@ -30,9 +30,9 @@ const Home: NextPage = () => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col justify-center items-center">
+    <div className="flex min-h-screen flex-col items-center justify-center">
       <div className="mb-4 text-5xl">Table of doom</div>
-      <table className="mx-10 table-fixed overflow-y-auto bg-slate-500">
+      <table className="mx-10 mb-auto table-fixed overflow-y-auto bg-slate-500">
         <thead className="bg-slate-600 uppercase">
           <tr className="table-row">
             <th className="py-3 px-6">Created</th>
@@ -45,7 +45,7 @@ const Home: NextPage = () => {
             <td id="created" className="align-top">
               <Dropzone
                 dragged={dragged}
-                className="flex flex-wrap justify-center items-center gap-2 px-2 py-4"
+                className="flex flex-wrap items-center justify-center gap-2 px-2 py-4"
               >
                 {tasks.data
                   ?.filter((task) => task.status == "created")
@@ -73,7 +73,7 @@ const Home: NextPage = () => {
               className="border-x-2 border-slate-600 align-top"
             >
               <Dropzone
-                className="flex flex-wrap justify-center items-center gap-2 px-2 py-4"
+                className="flex flex-wrap items-center justify-center gap-2 px-2 py-4"
                 dragged={dragged}
               >
                 {tasks.data
@@ -99,7 +99,7 @@ const Home: NextPage = () => {
 
             <td id="finished" className="align-top">
               <Dropzone
-                className="flex flex-wrap justify-center items-center gap-2 px-2 py-4"
+                className="flex flex-wrap items-center justify-center gap-2 px-2 py-4"
                 dragged={dragged}
               >
                 {tasks.data
@@ -125,8 +125,17 @@ const Home: NextPage = () => {
           </tr>
         </tbody>
       </table>
-      <a href="https://github.com/LeBulldoge/task-manager" className="absolute sticky bottom-0 place-self-end flex gap-1 pr-3 pb-1 text-xs text-slate-300 hover:underline">
-        <Image src="/GitHub-Mark-Light-32px.png" width={16} height={16} alt="GitHub Logo" />
+      <a
+        href="https://github.com/LeBulldoge/task-manager"
+        className="sticky bottom-0 flex gap-1 place-self-end pr-3 pb-1 text-xs text-slate-300 hover:underline group"
+      >
+        <Image
+          src="/GitHub-Mark-Light-32px.png"
+          width={16}
+          height={16}
+          alt="GitHub Logo"
+          className="group-hover:animate-spin"
+        />
         GitHub
       </a>
     </div>
