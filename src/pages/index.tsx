@@ -1,5 +1,5 @@
 import type { NextPage } from "next";
-import React, { FormEvent, MouseEvent } from "react";
+import React, { MouseEvent } from "react";
 
 import { Dropzone, Draggable } from "@/components/Draggable";
 import { TaskForm } from "@/components/TaskForm";
@@ -11,7 +11,6 @@ const Home: NextPage = () => {
 
   const tasks = trpc.tasks.getAll.useQuery();
   const createTask = trpc.tasks.createTask.useMutation();
-  const updateTask = trpc.tasks.updateTask.useMutation();
 
   const handleAddTask = (e: MouseEvent, status: string) => {
     const element = e.target as HTMLElement;
@@ -25,15 +24,8 @@ const Home: NextPage = () => {
     element.setAttribute("class", attrs + " animate-pulse");
   };
 
-  const handleMutateTask = (e: FormEvent, task: Task) => {
-    e.preventDefault()
-    e.stopPropagation()
-
-    updateTask.mutateAsync({ ...task }).then(() => {
-      tasks.refetch();
-    });
-
-    console.log(task);
+  const handleMutateTask = (task: Task) => {
+    tasks.refetch();
   };
 
   return (

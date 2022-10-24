@@ -1,11 +1,14 @@
+import { trpc } from "@/utils/trpc";
 import { Task } from "@prisma/client";
 import { ChangeEvent, FormEvent, useState } from "react";
 
 export const TaskForm = (props: {
   task: Task;
-  submitHandler?: (e: FormEvent, task: Task) => void;
+  submitHandler?: (task: Task) => void;
 }) => {
   const [task, setTask] = useState(props.task);
+
+  const updateTask = trpc.tasks.updateTask.useMutation();
 
   const handleOnChange = (event: ChangeEvent, changed: "name" | "status") => {
     const element = event.target as HTMLSelectElement | HTMLInputElement;
@@ -15,6 +18,15 @@ export const TaskForm = (props: {
     task[changed] = element.value;
     setTask(task);
   };
+
+  const handleOnSubmit = (event: FormEvent) => {
+    event.preventDefault()
+
+    updateTask.mutateAsync(task)
+      .then((newTask) => {
+        if (props.submitHandler) props.submitHandler(newTask)
+      })
+  }
 
   return (
     <form
@@ -29,9 +41,7 @@ export const TaskForm = (props: {
           }
         }
       }}
-      onSubmit={(e) =>
-        props.submitHandler ? props.submitHandler(e, task) : null
-      }
+      onSubmit={handleOnSubmit}
     >
       <label className="text-xs">
         Title:
