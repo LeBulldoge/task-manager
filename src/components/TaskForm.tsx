@@ -4,11 +4,12 @@ import { ChangeEvent, FormEvent, useState } from "react";
 
 export const TaskForm = (props: {
   task: Task;
-  submitHandler?: (task: Task) => void;
+  updateHandler?: (task: Task) => void;
 }) => {
   const [task, setTask] = useState(props.task);
 
   const updateTask = trpc.tasks.updateTask.useMutation();
+  const deleteTask = trpc.tasks.deleteTask.useMutation();
 
   const handleOnChange = (event: ChangeEvent, changed: "name" | "status") => {
     const element = event.target as HTMLSelectElement | HTMLInputElement;
@@ -17,21 +18,24 @@ export const TaskForm = (props: {
 
     task[changed] = element.value;
     setTask(task);
+
+    if (changed == "status") {
+      updateTask.mutateAsync(task);
+    }
   };
 
   const handleOnSubmit = (event: FormEvent) => {
-    event.preventDefault()
+    event.preventDefault();
 
-    updateTask.mutateAsync(task)
-      .then((newTask) => {
-        if (props.submitHandler) props.submitHandler(newTask)
-      })
-  }
+    updateTask.mutateAsync(task).then((newTask) => {
+      if (props.updateHandler) props.updateHandler(newTask);
+    });
+  };
 
   return (
     <form
       draggable="true"
-      className="flex h-36 w-36 flex-col bg-slate-600 p-2 drop-shadow-xl"
+      className="flex h-36 w-36 flex-col bg-slate-600 p-2 shadow-black transition ease-in-out hover:translate-y-1 hover:scale-110 hover:drop-shadow-xl"
       onDragEnd={(e) => {
         const element = e.target as HTMLElement;
         if (element.parentElement?.parentElement?.id) {
@@ -43,6 +47,19 @@ export const TaskForm = (props: {
       }}
       onSubmit={handleOnSubmit}
     >
+      <button
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          deleteTask.mutateAsync({ id: task.id }).then(() => {
+            if (props.updateHandler) props.updateHandler(task);
+          });
+        }}
+        className="absolute h-4 w-4 place-self-end rounded font-mono text-xs text-rose-300 hover:cursor-pointer hover:bg-slate-400"
+      >
+        x
+      </button>
+
       <label className="text-xs">
         Title:
         <input
