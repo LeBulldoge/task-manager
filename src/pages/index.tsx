@@ -33,24 +33,44 @@ const Home: NextPage = () => {
   };
 
   return (
-    <main className="container min-w-full flex min-h-screen flex-col items-center justify-center">
+    <main className="container flex min-h-screen min-w-full flex-col items-center justify-center">
       <div className="mb-24 text-5xl">Task table</div>
       <div className="flex">
-        <div className="z-20 flex w-12 flex-col py-3 px-2 items-center bg-slate-600">
-          <div className="flex sticky top-0">
-            <button className="peer h-6 w-6 bg-slate-300 text-center">+</button>
-            <div className="absolute -z-10 w-96 min-h-screen -translate-x-96 rounded border border-slate-500 border-l-slate-600 bg-slate-600 p-2 opacity-0 drop-shadow-2xl transition ease-in-out hover:translate-x-8 hover:opacity-100 peer-hover:translate-x-8 peer-hover:opacity-100">
+        <div className="flex justify-center bg-slate-600">
+          <div className="peer sticky top-0 flex flex-col py-3 px-2">
+            <button className="h-8 w-8 rounded border border-slate-500 text-center">
+              S
+            </button>
+          </div>
+          <div className="min-h-screen w-0 border-x border-x-slate-500 py-2 opacity-0 drop-shadow-2xl transition-all duration-75 ease-in hover:w-96 hover:px-2 hover:opacity-100 peer-hover:w-96 peer-hover:px-2 peer-hover:opacity-100 peer-hover:duration-150 group">
+            <strong className="text-xl">Status List</strong>
+            <ul className="list-inside list-disc">
               {list.map((status, index) => {
-                return <p key={index}>{status}</p>;
+                return (
+                  <li
+                    key={index}
+                    className="mb-4 border-b border-b-slate-500 text-slate-300"
+                  >
+                    <input
+                      type="text"
+                      defaultValue={status}
+                      className="bg-inherit text-white"
+                    />
+                  </li>
+                );
               })}
-            </div>
+            </ul>
           </div>
         </div>
         <table className="mb-auto w-full table-fixed overflow-y-auto bg-slate-500">
           <thead className="sticky top-0 z-10 bg-slate-600 uppercase">
             <tr className="table-row">
               {list.map((status) => {
-                return <th key={status} className="py-3 px-6">{status}</th>;
+                return (
+                  <th key={status} className="py-3 px-6">
+                    {status}
+                  </th>
+                );
               })}
             </tr>
           </thead>
