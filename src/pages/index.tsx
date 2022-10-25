@@ -40,8 +40,8 @@ const Home: NextPage = () => {
           <div className="flex sticky top-0">
             <button className="peer h-6 w-6 bg-slate-300 text-center">+</button>
             <div className="absolute -z-10 w-96 min-h-screen -translate-x-96 rounded border border-slate-500 border-l-slate-600 bg-slate-600 p-2 opacity-0 drop-shadow-2xl transition ease-in-out hover:translate-x-8 hover:opacity-100 peer-hover:translate-x-8 peer-hover:opacity-100">
-              {list.map((status) => {
-                return <p>{status}</p>;
+              {list.map((status, index) => {
+                return <p key={index}>{status}</p>;
               })}
             </div>
           </div>
@@ -50,7 +50,7 @@ const Home: NextPage = () => {
           <thead className="sticky top-0 z-10 bg-slate-600 uppercase">
             <tr className="table-row">
               {list.map((status) => {
-                return <th className="py-3 px-6">{status}</th>;
+                return <th key={status} className="py-3 px-6">{status}</th>;
               })}
             </tr>
           </thead>
@@ -58,7 +58,7 @@ const Home: NextPage = () => {
             <tr>
               {list.map((status) => {
                 return (
-                  <td id={status} className="align-top">
+                  <td key={status} id={status} className="align-top">
                     <Dropzone
                       dragged={dragged}
                       className="flex flex-wrap items-center justify-center gap-2 px-2 py-4"
