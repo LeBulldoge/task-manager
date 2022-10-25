@@ -65,8 +65,9 @@ export const TaskForm = (props: {
         <input
           type="text"
           defaultValue={task.name}
+          required={true}
           onChange={(e) => handleOnChange(e, "name")}
-          className="mb-2 w-full rounded border-b border-b-slate-500 bg-slate-600 px-2 text-base"
+          className="mb-2 w-full rounded border-b border-b-slate-500 bg-slate-600 px-2 text-base invalid:border invalid:border-rose-300"
         />
       </label>
       <label className="text-xs">
