@@ -1,90 +1,83 @@
 import { trpc } from "@/utils/trpc";
 import { Status, Task } from "@prisma/client";
-import { ChangeEvent, FormEvent, useState } from "react";
+import { ChangeEvent, DragEvent, FormEvent, useState } from "react";
 
 export const TaskForm = (props: {
   task: Task;
   statuses: Status[];
-  updateHandler?: (task: Task) => void;
+  onUpdate?: (task: Task) => void;
 }) => {
-  const [task, setTask] = useState(props.task);
+  const [name, setName] = useState(props.task.name);
+  const [status, setStatus] = useState(props.task.statusId);
 
   const updateTask = trpc.tasks.updateTask.useMutation();
   const deleteTask = trpc.tasks.deleteTask.useMutation();
 
   const handleOnChangeStatus = (event: ChangeEvent<HTMLSelectElement>) => {
     const element = event.target;
-    const attrs = element.getAttribute("class");
-    element.setAttribute("class", "border border-yellow-600 " + attrs);
-
-    task.statusId =
-      props.statuses.find((s) => s.name === element.value)?.id ?? 0;
-    setTask(task);
+    setStatus(props.statuses.find((s) => s.name === element.value)?.id ?? 0);
   };
 
-  const handleOnChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleOnChangeName = (event: ChangeEvent<HTMLInputElement>) => {
     const element = event.target;
-    const attrs = element.getAttribute("class");
-    element.setAttribute("class", "border border-yellow-600 " + attrs);
-
-    task.name = element.value;
-    setTask(task);
+    setName(element.value);
   };
 
   const handleOnSubmit = (event: FormEvent) => {
     event.preventDefault();
 
-    updateTask.mutateAsync(task).then((newTask) => {
-      if (props.updateHandler) props.updateHandler(newTask);
+    props.task.name = name;
+    props.task.statusId = status;
+
+    updateTask.mutateAsync(props.task).then((newTask) => {
+      props.onUpdate?.(newTask);
     });
   };
 
   return (
     <form
-      draggable="true"
       className="flex h-36 w-36 flex-col bg-slate-600 p-2 shadow-black transition ease-in-out hover:translate-y-1 hover:scale-110 hover:drop-shadow-xl"
-      onDragEnd={(e) => {
-        const element = e.target as HTMLElement;
-        if (element.parentElement?.parentElement?.id) {
-          const select = element.getElementsByTagName("select").item(0);
-          if (select) {
-            select.value = element.parentElement?.parentElement?.id;
-          }
-        }
-      }}
       onSubmit={handleOnSubmit}
     >
-      <button
+      <input
+        type="button"
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
-          deleteTask.mutateAsync({ where: { id: task.id } }).then(() => {
-            if (props.updateHandler) props.updateHandler(task);
+          deleteTask.mutateAsync({ where: { id: props.task.id } }).then(() => {
+            if (props.onUpdate) props.onUpdate(props.task);
           });
         }}
         className="absolute h-4 w-4 place-self-end rounded font-mono text-xs text-rose-300 hover:cursor-pointer hover:bg-slate-400"
-      >
-        x
-      </button>
+        value="x"
+      />
 
       <label className="text-xs">
         Title:
         <input
           type="text"
-          defaultValue={task.name}
+          value={name}
           required={true}
-          onChange={(e) => handleOnChange(e)}
-          className="mb-2 w-full rounded border-b border-b-slate-500 bg-slate-600 px-2 text-base invalid:border invalid:border-rose-300"
+          onChange={(e) => handleOnChangeName(e)}
+          className={
+            "mb-2 w-full rounded border bg-slate-600 px-2 text-base invalid:border invalid:border-rose-300 " +
+            (props.task.name !== name
+              ? "border-yellow-600"
+              : "border-slate-600 border-b-slate-500")
+          }
         />
       </label>
       <label className="text-xs">
         Status:
         <select
-          defaultValue={
-            props.statuses.find((s) => s.id === task.statusId)?.name ?? 0
-          }
+          value={props.statuses.find((s) => s.id === status)?.name ?? 0}
           onChange={(e) => handleOnChangeStatus(e)}
-          className="w-full rounded border-b border-b-slate-500 bg-slate-600 px-1 text-base capitalize"
+          className={
+            "w-full rounded border-b bg-slate-600 px-1 text-base capitalize " +
+            (props.task.statusId !== status
+              ? "border border-yellow-200"
+              : "border-b-slate-500")
+          }
         >
           {props.statuses.map((status) => {
             return <option key={status.id.toString()}>{status.name}</option>;
@@ -92,11 +85,24 @@ export const TaskForm = (props: {
         </select>
       </label>
       <div className="grow" />
-      <input
-        className="place-self-end rounded border-slate-400 p-1 hover:cursor-pointer hover:bg-slate-500 focus:border"
-        type="submit"
-        value="Submit"
-      />
+      <div className="flex w-full justify-between">
+        <input
+          type="button"
+          value="Reset"
+          className="disabled:text-slate-300 rounded border-slate-400 p-1 text-rose-200 enabled:hover:cursor-pointer enabled:hover:bg-slate-500 focus:border"
+          disabled={props.task.name === name && props.task.statusId === status}
+          onClick={() => {
+            setName(props.task.name);
+            setStatus(props.task.statusId);
+          }}
+        />
+        <input
+          type="submit"
+          className="disabled:text-slate-300 rounded border-slate-400 p-1 text-green-200 enabled:hover:cursor-pointer enabled:hover:bg-slate-500 focus:border"
+          disabled={props.task.name === name && props.task.statusId === status}
+          value="Submit"
+        />
+      </div>
     </form>
   );
 };

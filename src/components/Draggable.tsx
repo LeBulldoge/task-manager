@@ -1,3 +1,5 @@
+import { DragEvent } from "react";
+
 export const Draggable = (props: {
   children?: React.ReactNode;
   setDragged: (element: HTMLElement | null) => void;
@@ -5,9 +7,10 @@ export const Draggable = (props: {
   return (
     <div
       onDragStart={(e) => {
-        props.setDragged(e.target as HTMLElement);
+        props.setDragged(e.currentTarget);
       }}
-      onDragEnd={() => {
+      onDragEnd={(e) => {
+        e.preventDefault();
         props.setDragged(null);
       }}
       draggable="true"
@@ -35,9 +38,9 @@ export const Dropzone = (props: {
         e.preventDefault();
         e.stopPropagation();
 
-        const element = e.currentTarget as HTMLElement;
+        const element = e.currentTarget;
         if (props.dragged && !element.contains(props.dragged)) {
-          element.prepend(props.dragged);
+          //element.prepend(props.dragged);
         }
       }}
       className={props.className}
