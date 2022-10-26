@@ -7,11 +7,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Task {
-  id        String   @id @default(cuid())
+model Status {
+  id    Int    @id @default(autoincrement())
+  name String  @unique
 
-  name      String
-  status    String
+  tasks Task[]
+}
+
+model Task {
+  id Int @id @default(autoincrement())
+
+  name     String
+  status   Status @relation(fields: [statusId], references: [id])
+  statusId Int
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
