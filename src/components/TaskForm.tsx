@@ -1,9 +1,10 @@
 import { trpc } from "@/utils/trpc";
-import { Task } from "@prisma/client";
+import { Status, Task } from "@prisma/client";
 import { ChangeEvent, FormEvent, useState } from "react";
 
 export const TaskForm = (props: {
   task: Task;
+  statuses: Status[];
   updateHandler?: (task: Task) => void;
 }) => {
   const [task, setTask] = useState(props.task);
@@ -11,17 +12,23 @@ export const TaskForm = (props: {
   const updateTask = trpc.tasks.updateTask.useMutation();
   const deleteTask = trpc.tasks.deleteTask.useMutation();
 
-  const handleOnChange = (event: ChangeEvent, changed: "name" | "status") => {
-    const element = event.target as HTMLSelectElement | HTMLInputElement;
+  const handleOnChangeStatus = (event: ChangeEvent<HTMLSelectElement>) => {
+    const element = event.target;
     const attrs = element.getAttribute("class");
     element.setAttribute("class", "border border-yellow-600 " + attrs);
 
-    task[changed] = element.value;
+    task.statusId =
+      props.statuses.find((s) => s.name === element.value)?.id ?? 0;
     setTask(task);
+  };
 
-    if (changed == "status") {
-      updateTask.mutateAsync(task);
-    }
+  const handleOnChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const element = event.target;
+    const attrs = element.getAttribute("class");
+    element.setAttribute("class", "border border-yellow-600 " + attrs);
+
+    task.name = element.value;
+    setTask(task);
   };
 
   const handleOnSubmit = (event: FormEvent) => {
@@ -51,7 +58,7 @@ export const TaskForm = (props: {
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
-          deleteTask.mutateAsync({ id: task.id }).then(() => {
+          deleteTask.mutateAsync({ where: { id: task.id } }).then(() => {
             if (props.updateHandler) props.updateHandler(task);
           });
         }}
@@ -66,20 +73,22 @@ export const TaskForm = (props: {
           type="text"
           defaultValue={task.name}
           required={true}
-          onChange={(e) => handleOnChange(e, "name")}
+          onChange={(e) => handleOnChange(e)}
           className="mb-2 w-full rounded border-b border-b-slate-500 bg-slate-600 px-2 text-base invalid:border invalid:border-rose-300"
         />
       </label>
       <label className="text-xs">
         Status:
         <select
-          defaultValue={task.status}
-          onChange={(e) => handleOnChange(e, "status")}
+          defaultValue={
+            props.statuses.find((s) => s.id === task.statusId)?.name ?? 0
+          }
+          onChange={(e) => handleOnChangeStatus(e)}
           className="w-full rounded border-b border-b-slate-500 bg-slate-600 px-1 text-base capitalize"
         >
-          <option>created</option>
-          <option>in-progress</option>
-          <option>finished</option>
+          {props.statuses.map((status) => {
+            return <option key={status.id.toString()}>{status.name}</option>;
+          })}
         </select>
       </label>
       <div className="grow" />

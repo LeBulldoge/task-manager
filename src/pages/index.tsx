@@ -12,15 +12,14 @@ const Home: NextPage = () => {
   const [dragged, setDragged] = useState<HTMLElement | null>(null);
   const [isAddingCell, setIsAddingCell] = useState(false);
 
-  const list = ["created", "in-progress", "finished"];
-
-  const tasks = trpc.tasks.getAll.useQuery();
+  const tasks = trpc.tasks.getAllTasks.useQuery();
+  const statuses = trpc.tasks.getAllStatuses.useQuery();
   const createTask = trpc.tasks.createTask.useMutation();
 
-  const handleAddTask = (status: string) => {
+  const handleAddTask = (status: number) => {
     if (isAddingCell) return;
 
-    createTask.mutateAsync({ name: "New task", status: status }).then(() => {
+    createTask.mutateAsync({ name: "New task", statusId: status }).then(() => {
       tasks.refetch();
       setIsAddingCell(false);
     });
@@ -45,15 +44,15 @@ const Home: NextPage = () => {
           <div className="min-h-screen w-0 border-x border-x-slate-500 py-2 opacity-0 drop-shadow-2xl transition-all duration-75 ease-in hover:w-96 hover:px-2 hover:opacity-100 peer-hover:w-96 peer-hover:px-2 peer-hover:opacity-100 peer-hover:duration-150 group">
             <strong className="text-xl">Status List</strong>
             <ul className="list-inside list-disc">
-              {list.map((status, index) => {
+              {statuses.data?.map((status) => {
                 return (
                   <li
-                    key={index}
+                    key={status.id.toString()}
                     className="mb-4 border-b border-b-slate-500 text-slate-300"
                   >
                     <input
                       type="text"
-                      defaultValue={status}
+                      defaultValue={status.name}
                       className="bg-inherit text-white"
                     />
                   </li>
@@ -65,10 +64,10 @@ const Home: NextPage = () => {
         <table className="mb-auto w-full table-fixed overflow-y-auto bg-slate-500">
           <thead className="sticky top-0 z-10 bg-slate-600 uppercase">
             <tr className="table-row">
-              {list.map((status) => {
+              {statuses.data?.map((status) => {
                 return (
-                  <th key={status} className="py-3 px-6">
-                    {status}
+                  <th key={status.id.toString()} className="py-3 px-6">
+                    {status.name}
                   </th>
                 );
               })}
@@ -76,19 +75,20 @@ const Home: NextPage = () => {
           </thead>
           <tbody>
             <tr>
-              {list.map((status) => {
+              {statuses.data?.map((status) => {
                 return (
-                  <td key={status} id={status} className="align-top">
+                  <td key={status.id.toString()} id={status.toString()} className="align-top">
                     <Dropzone
                       dragged={dragged}
                       className="flex flex-wrap items-center justify-center gap-2 px-2 py-4"
                     >
                       {tasks.data
-                        ?.filter((task) => task.status == status)
+                        ?.filter((task) => task.statusId == status.id)
                         .map((task) => {
                           return (
                             <Draggable key={task.id} setDragged={setDragged}>
                               <TaskForm
+                                statuses={statuses.data}
                                 task={task}
                                 updateHandler={handleUpdateTask}
                               />
@@ -97,7 +97,7 @@ const Home: NextPage = () => {
                         })}
                       <AddButton
                         disabled={isAddingCell}
-                        onClick={() => handleAddTask(status)}
+                        onClick={() => handleAddTask(status.id)}
                       />
                     </Dropzone>
                   </td>
