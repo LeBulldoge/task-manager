@@ -1,6 +1,6 @@
 import { trpc } from "@/utils/trpc";
 import { Status, Task } from "@prisma/client";
-import { ChangeEvent, DragEvent, FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 
 export const TaskForm = (props: {
   task: Task;
@@ -62,7 +62,7 @@ export const TaskForm = (props: {
           className={
             "mb-2 w-full rounded border bg-slate-600 px-2 text-base invalid:border invalid:border-rose-300 " +
             (props.task.name !== name
-              ? "border-yellow-600"
+              ? "border-orange-200/75"
               : "border-slate-600 border-b-slate-500")
           }
         />
@@ -73,10 +73,10 @@ export const TaskForm = (props: {
           value={props.statuses.find((s) => s.id === status)?.name ?? 0}
           onChange={(e) => handleOnChangeStatus(e)}
           className={
-            "w-full rounded border-b bg-slate-600 px-1 text-base capitalize " +
+            "w-full rounded border bg-slate-600 px-1 text-base capitalize " +
             (props.task.statusId !== status
-              ? "border border-yellow-200"
-              : "border-b-slate-500")
+              ? "border-orange-200/75"
+              : "border-slate-600 border-b-slate-500")
           }
         >
           {props.statuses.map((status) => {
