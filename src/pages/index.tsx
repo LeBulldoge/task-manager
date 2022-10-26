@@ -7,6 +7,7 @@ import { trpc } from "@/utils/trpc";
 import { Task } from "@prisma/client";
 import Image from "next/future/image";
 import { AddButton } from "@/components/AddButton";
+import Head from "next/head";
 
 const Home: NextPage = () => {
   const [currentlyDragged, setCurrentlyDragged] = useState<HTMLElement | null>(
@@ -35,10 +36,10 @@ const Home: NextPage = () => {
 
   return (
     <>
-      <head>
+      <Head>
         <title>Task Manager</title>
         <meta name="description" content="WIP task manager web application" />
-      </head>
+      </Head>
 
       <main className="container flex min-h-screen min-w-full flex-col items-center justify-center">
         <div className="flex">
