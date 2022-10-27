@@ -14,6 +14,7 @@ const Home: NextPage = () => {
     null
   );
   const [isAddingCell, setIsAddingCell] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const tasks = trpc.tasks.getAllTasks.useQuery();
   const statuses = trpc.tasks.getAllStatuses.useQuery();
@@ -100,12 +101,14 @@ const Home: NextPage = () => {
                             return (
                               <Draggable
                                 key={task.id}
+                                disable={isEditing}
                                 setDragged={setCurrentlyDragged}
                               >
                                 <TaskForm
                                   task={task}
                                   statuses={statuses.data}
                                   onUpdate={handleUpdateTask}
+                                  onEdit={setIsEditing}
                                 />
                               </Draggable>
                             );

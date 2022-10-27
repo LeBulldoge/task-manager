@@ -3,17 +3,22 @@ import { DragEvent } from "react";
 export const Draggable = (props: {
   children?: React.ReactNode;
   setDragged: (element: HTMLElement | null) => void;
+  disable: boolean;
 }) => {
   return (
     <div
       onDragStart={(e) => {
+        if (props.disable) {
+          e.preventDefault();
+          return;
+        }
         props.setDragged(e.currentTarget);
       }}
       onDragEnd={(e) => {
         e.preventDefault();
         props.setDragged(null);
       }}
-      draggable="true"
+      draggable={!props.disable}
       className="hover:cursor-move"
     >
       {props.children}

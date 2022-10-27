@@ -6,6 +6,7 @@ export const TaskForm = (props: {
   task: Task;
   statuses: Status[];
   onUpdate?: (task: Task) => void;
+  onEdit?: (isEditing: boolean) => void;
 }) => {
   const [name, setName] = useState(props.task.name);
   const [status, setStatus] = useState(props.task.statusId);
@@ -59,6 +60,8 @@ export const TaskForm = (props: {
           value={name}
           required={true}
           onChange={(e) => handleOnChangeName(e)}
+          onFocus={() => props.onEdit?.(true)}
+          onBlur={() => props.onEdit?.(false)}
           className={
             "mb-2 w-full rounded border bg-slate-600 px-2 text-base invalid:border invalid:border-rose-300 " +
             (props.task.name !== name
