@@ -5,18 +5,27 @@ import { ChangeEvent, FormEvent, useState } from "react";
 export const TaskForm = (props: {
   task: Task;
   statuses: Status[];
-  onUpdate?: (task: Task) => void;
   onEdit?: (isEditing: boolean) => void;
 }) => {
   const [name, setName] = useState(props.task.name);
-  const [status, setStatus] = useState(props.task.statusId);
+  const [statusId, setStatusId] = useState(props.task.statusId);
 
-  const updateTask = trpc.tasks.updateTask.useMutation();
-  const deleteTask = trpc.tasks.deleteTask.useMutation();
+  const utils = trpc.useContext();
+  const updateTask = trpc.tasks.updateTask.useMutation({
+    async onSuccess() {
+      utils.tasks.invalidate();
+    },
+  });
+
+  const deleteTask = trpc.tasks.deleteTask.useMutation({
+    async onSuccess() {
+      utils.tasks.invalidate();
+    },
+  });
 
   const handleOnChangeStatus = (event: ChangeEvent<HTMLSelectElement>) => {
     const element = event.target;
-    setStatus(props.statuses.find((s) => s.name === element.value)?.id ?? 0);
+    setStatusId(props.statuses.find((s) => s.name === element.value)?.id ?? 0);
   };
 
   const handleOnChangeName = (event: ChangeEvent<HTMLInputElement>) => {
@@ -24,14 +33,11 @@ export const TaskForm = (props: {
     setName(element.value);
   };
 
-  const handleOnSubmit = (event: FormEvent) => {
+  const handleOnSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
-    props.task.name = name;
-    props.task.statusId = status;
-
-    updateTask.mutateAsync(props.task).then((newTask) => {
-      props.onUpdate?.(newTask);
+    updateTask.mutateAsync({
+      where: { id: props.task.id },
+      data: { name: name, statusId: statusId },
     });
   };
 
@@ -42,12 +48,10 @@ export const TaskForm = (props: {
     >
       <input
         type="button"
-        onClick={(e) => {
+        onClick={async (e) => {
           e.preventDefault();
           e.stopPropagation();
-          deleteTask.mutateAsync({ where: { id: props.task.id } }).then(() => {
-            if (props.onUpdate) props.onUpdate(props.task);
-          });
+          deleteTask.mutateAsync({ where: { id: props.task.id } });
         }}
         className="absolute h-4 w-4 place-self-end rounded font-mono text-xs text-rose-300 hover:cursor-pointer hover:bg-slate-400"
         value="x"
@@ -73,11 +77,11 @@ export const TaskForm = (props: {
       <label className="text-xs">
         Status:
         <select
-          value={props.statuses.find((s) => s.id === status)?.name ?? 0}
+          value={props.statuses.find((s) => s.id === statusId)?.name ?? 0}
           onChange={(e) => handleOnChangeStatus(e)}
           className={
             "w-full rounded border bg-slate-600 px-1 text-base capitalize " +
-            (props.task.statusId !== status
+            (props.task.statusId !== statusId
               ? "border-orange-200/75"
               : "border-slate-600 border-b-slate-500")
           }
@@ -92,17 +96,21 @@ export const TaskForm = (props: {
         <input
           type="button"
           value="Reset"
-          className="disabled:text-slate-300 rounded border-slate-400 p-1 text-rose-200 enabled:hover:cursor-pointer enabled:hover:bg-slate-500 focus:border"
-          disabled={props.task.name === name && props.task.statusId === status}
+          className="rounded border-slate-400 p-1 text-rose-200 focus:border enabled:hover:cursor-pointer enabled:hover:bg-slate-500 disabled:text-slate-300"
+          disabled={
+            props.task.name === name && props.task.statusId === statusId
+          }
           onClick={() => {
             setName(props.task.name);
-            setStatus(props.task.statusId);
+            setStatusId(props.task.statusId);
           }}
         />
         <input
           type="submit"
-          className="disabled:text-slate-300 rounded border-slate-400 p-1 text-green-200 enabled:hover:cursor-pointer enabled:hover:bg-slate-500 focus:border"
-          disabled={props.task.name === name && props.task.statusId === status}
+          className="rounded border-slate-400 p-1 text-green-200 focus:border enabled:hover:cursor-pointer enabled:hover:bg-slate-500 disabled:text-slate-300"
+          disabled={
+            props.task.name === name && props.task.statusId === statusId
+          }
           value="Submit"
         />
       </div>

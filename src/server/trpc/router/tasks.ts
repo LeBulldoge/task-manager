@@ -1,22 +1,33 @@
 import { router, publicProcedure } from "@/server/trpc/trpc";
-import type { Task } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { z } from "zod";
 
-const schemaForType =
-  <T>() =>
-  <S extends z.ZodType<T, any, any>>(arg: S) => {
-    return arg;
-  };
+const taskUpdateSchema: z.ZodType<Prisma.TaskUpdateArgs> = z.object({
+  where: z.object({
+    id: z.number(),
+  }),
+  data: z.object({
+    name: z.string().optional(),
+    statusId: z.number().optional(),
+    createdAt: z.date().optional(),
+    updatedAt: z.date().optional(),
+  }),
+});
 
-const taskInputSchema = schemaForType<Partial<Task>>()(
-  z.object({
-    id: z.number().optional(),
+const taskCreateSchema: z.ZodType<Prisma.TaskCreateArgs> = z.object({
+  data: z.object({
     name: z.string(),
     statusId: z.number(),
     createdAt: z.date().optional(),
     updatedAt: z.date().optional(),
-  })
-);
+  }),
+});
+
+const taskDeleteSchema: z.ZodType<Prisma.TaskDeleteArgs> = z.object({
+  where: z.object({
+    id: z.number().optional(),
+  }),
+});
 
 export const taskRouter = router({
   getAllTasks: publicProcedure.query(({ ctx }) => {
@@ -27,29 +38,21 @@ export const taskRouter = router({
     return ctx.prisma.status.findMany();
   }),
 
-  createTask: publicProcedure.input(taskInputSchema).mutation(({ ctx, input }) => {
-    return ctx.prisma.task.create({
-      data: { name: input.name, statusId: input.statusId },
-    });
-  }),
+  createTask: publicProcedure
+    .input(taskCreateSchema)
+    .mutation(({ ctx, input }) => {
+      return ctx.prisma.task.create(input);
+    }),
 
-  updateTask: publicProcedure.input(taskInputSchema).mutation(({ ctx, input }) => {
-    return ctx.prisma.task.update({
-      where: {
-        id: input.id,
-      },
-      data: {
-        name: input.name,
-        statusId: input.statusId,
-      },
-    });
-  }),
+  updateTask: publicProcedure
+    .input(taskUpdateSchema)
+    .mutation(({ ctx, input }) => {
+      return ctx.prisma.task.update(input);
+    }),
 
   deleteTask: publicProcedure
-    .input(z.object({ where: z.object({ id: z.number() }) }))
+    .input(taskDeleteSchema)
     .mutation(({ ctx, input }) => {
-      return ctx.prisma.task.delete({
-        where: input.where,
-      });
+      return ctx.prisma.task.delete(input);
     }),
 });

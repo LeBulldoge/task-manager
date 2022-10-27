@@ -4,7 +4,6 @@ import { useState } from "react";
 import { Dropzone, Draggable } from "@/components/Draggable";
 import { TaskForm } from "@/components/TaskForm";
 import { trpc } from "@/utils/trpc";
-import { Task } from "@prisma/client";
 import Image from "next/future/image";
 import { AddButton } from "@/components/AddButton";
 import Head from "next/head";
@@ -16,23 +15,24 @@ const Home: NextPage = () => {
   const [isAddingCell, setIsAddingCell] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
+  const utils = trpc.useContext();
   const tasks = trpc.tasks.getAllTasks.useQuery();
   const statuses = trpc.tasks.getAllStatuses.useQuery();
-  const createTask = trpc.tasks.createTask.useMutation();
+
+  const createTask = trpc.tasks.createTask.useMutation({
+    async onSuccess() {
+      await utils.tasks.invalidate();
+    }
+  });
 
   const handleAddTask = (status: number) => {
     if (isAddingCell) return;
 
-    createTask.mutateAsync({ name: "New task", statusId: status }).then(() => {
-      tasks.refetch();
+    createTask.mutateAsync({ data: { name: "New task", statusId: status } }).then(() => {
       setIsAddingCell(false);
     });
 
     setIsAddingCell(true);
-  };
-
-  const handleUpdateTask = (task: Task) => {
-    tasks.refetch();
   };
 
   return (
@@ -107,7 +107,6 @@ const Home: NextPage = () => {
                                 <TaskForm
                                   task={task}
                                   statuses={statuses.data}
-                                  onUpdate={handleUpdateTask}
                                   onEdit={setIsEditing}
                                 />
                               </Draggable>
