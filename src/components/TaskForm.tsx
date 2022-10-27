@@ -9,11 +9,14 @@ export const TaskForm = (props: {
 }) => {
   const [name, setName] = useState(props.task.name);
   const [statusId, setStatusId] = useState(props.task.statusId);
+  const [isBeingDeleted, setIsBeingDeleted] = useState(false);
 
   const utils = trpc.useContext();
   const updateTask = trpc.tasks.updateTask.useMutation({
-    async onSuccess() {
-      utils.tasks.invalidate();
+    async onSuccess(task) {
+      if (task.statusId != props.task.statusId) {
+        utils.tasks.invalidate();
+      }
     },
   });
 
@@ -21,14 +24,20 @@ export const TaskForm = (props: {
     async onSuccess() {
       utils.tasks.invalidate();
     },
+    async onError(error) {
+      console.log(error);
+      setIsBeingDeleted(false);
+    },
   });
 
-  const handleOnChangeStatus = (event: ChangeEvent<HTMLSelectElement>) => {
+  const handleOnChangeStatus = async (
+    event: ChangeEvent<HTMLSelectElement>
+  ) => {
     const element = event.target;
     setStatusId(props.statuses.find((s) => s.name === element.value)?.id ?? 0);
   };
 
-  const handleOnChangeName = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleOnChangeName = async (event: ChangeEvent<HTMLInputElement>) => {
     const element = event.target;
     setName(element.value);
   };
@@ -43,14 +52,20 @@ export const TaskForm = (props: {
 
   return (
     <form
-      className="flex h-36 w-36 flex-col bg-slate-600 p-2 shadow-black transition ease-in-out hover:translate-y-1 hover:scale-110 hover:drop-shadow-xl"
+      className={`flex h-36 w-36 flex-col bg-slate-600 p-2 shadow-black transition ease-in-out hover:translate-y-1 hover:scale-110 hover:drop-shadow-xl ${
+        !isBeingDeleted || "animate-pulse"
+      }`}
       onSubmit={handleOnSubmit}
     >
       <input
         type="button"
+        disabled={isBeingDeleted}
         onClick={async (e) => {
           e.preventDefault();
           e.stopPropagation();
+
+          setIsBeingDeleted(true);
+
           deleteTask.mutateAsync({ where: { id: props.task.id } });
         }}
         className="absolute h-4 w-4 place-self-end rounded font-mono text-xs text-rose-300 hover:cursor-pointer hover:bg-slate-400"
@@ -63,6 +78,7 @@ export const TaskForm = (props: {
           type="text"
           value={name}
           required={true}
+          disabled={isBeingDeleted}
           onChange={(e) => handleOnChangeName(e)}
           onFocus={() => props.onEdit?.(true)}
           onBlur={() => props.onEdit?.(false)}
@@ -77,6 +93,7 @@ export const TaskForm = (props: {
         Status:
         <select
           value={props.statuses.find((s) => s.id === statusId)?.name ?? 0}
+          disabled={isBeingDeleted}
           onChange={(e) => handleOnChangeStatus(e)}
           className={`w-full rounded border-b ${
             props.task.statusId !== statusId
@@ -96,7 +113,8 @@ export const TaskForm = (props: {
           value="Reset"
           className="rounded border-slate-400 p-1 text-rose-200 focus:border enabled:hover:cursor-pointer enabled:hover:bg-slate-500 disabled:text-slate-300"
           disabled={
-            props.task.name === name && props.task.statusId === statusId
+            (props.task.name === name && props.task.statusId === statusId) ||
+            isBeingDeleted
           }
           onClick={() => {
             setName(props.task.name);
@@ -107,7 +125,8 @@ export const TaskForm = (props: {
           type="submit"
           className="rounded border-slate-400 p-1 text-green-200 focus:border enabled:hover:cursor-pointer enabled:hover:bg-slate-500 disabled:text-slate-300"
           disabled={
-            props.task.name === name && props.task.statusId === statusId
+            (props.task.name === name && props.task.statusId === statusId) ||
+            isBeingDeleted
           }
           value="Submit"
         />
