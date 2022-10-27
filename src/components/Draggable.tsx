@@ -1,4 +1,4 @@
-import { DragEvent } from "react";
+import { useRef } from "react";
 
 export const Draggable = (props: {
   children?: React.ReactNode;
@@ -32,8 +32,10 @@ export const Dropzone = (props: {
   dragged: HTMLElement | null;
   className?: string;
 }) => {
+  const self = useRef<HTMLDivElement>(null);
   return (
     <div
+      ref={self}
       id={props.id}
       onDragOver={(e) => {
         e.preventDefault();
@@ -45,10 +47,15 @@ export const Dropzone = (props: {
 
         const element = e.currentTarget;
         if (props.dragged && !element.contains(props.dragged)) {
-          //element.prepend(props.dragged);
+          // TODO: figure out how to communicate with children
+          element.prepend(props.dragged);
         }
       }}
-      className={props.className}
+      className={`${props.className} transition-all duration-200 ease-out ${
+        props.dragged && !self?.current?.contains(props.dragged)
+          ? " border-collapse rounded-bl-lg border border-l-4 border-slate-600 bg-slate-400"
+          : " border-transparent"
+      }`}
     >
       {props.children}
     </div>

@@ -66,12 +66,11 @@ export const TaskForm = (props: {
           onChange={(e) => handleOnChangeName(e)}
           onFocus={() => props.onEdit?.(true)}
           onBlur={() => props.onEdit?.(false)}
-          className={
-            "mb-2 w-full rounded border bg-slate-600 px-2 text-base invalid:border invalid:border-rose-300 " +
-            (props.task.name !== name
-              ? "border-orange-200/75"
-              : "border-slate-600 border-b-slate-500")
-          }
+          className={`mb-2 w-full rounded border-b ${
+            props.task.name !== name
+              ? "border-b-orange-200/75"
+              : "border-b-slate-500 focus:border-b-slate-400"
+          } bg-transparent px-2 text-base invalid:border invalid:border-rose-300`}
         />
       </label>
       <label className="text-xs">
@@ -79,12 +78,11 @@ export const TaskForm = (props: {
         <select
           value={props.statuses.find((s) => s.id === statusId)?.name ?? 0}
           onChange={(e) => handleOnChangeStatus(e)}
-          className={
-            "w-full rounded border bg-slate-600 px-1 text-base capitalize " +
-            (props.task.statusId !== statusId
+          className={`w-full rounded border-b ${
+            props.task.statusId !== statusId
               ? "border-orange-200/75"
-              : "border-slate-600 border-b-slate-500")
-          }
+              : "border-slate-600 border-b-slate-500"
+          } bg-transparent px-1 text-base capitalize`}
         >
           {props.statuses.map((status) => {
             return <option key={status.id.toString()}>{status.name}</option>;
