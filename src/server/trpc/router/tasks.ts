@@ -25,7 +25,7 @@ const taskCreateSchema: z.ZodType<Prisma.TaskCreateArgs> = z.object({
 
 const taskDeleteSchema: z.ZodType<Prisma.TaskDeleteArgs> = z.object({
   where: z.object({
-    id: z.number().optional(),
+    id: z.number(),
   }),
 });
 
@@ -37,7 +37,7 @@ const statusCreateSchema: z.ZodType<Prisma.StatusCreateArgs> = z.object({
 
 const statusUpdateSchema: z.ZodType<Prisma.StatusUpdateArgs> = z.object({
   where: z.object({
-    id: z.number().optional(),
+    id: z.number()
   }),
   data: z.object({
     name: z.string(),
@@ -79,9 +79,9 @@ export const taskRouter = router({
 
   createStatus: publicProcedure
     .input(statusCreateSchema)
-    .mutation(({ctx, input}) => {
-    return ctx.prisma.status.create(input);
-  }),
+    .mutation(({ ctx, input }) => {
+      return ctx.prisma.status.create(input);
+    }),
 
   updateStatus: publicProcedure
     .input(statusUpdateSchema)
@@ -92,6 +92,13 @@ export const taskRouter = router({
   deleteStatus: publicProcedure
     .input(statusDeleteSchema)
     .mutation(({ ctx, input }) => {
-      return ctx.prisma.status.delete(input);
+      const res = ctx.prisma.task.deleteMany({
+        where: {
+          statusId: input.where.id
+        }
+      }).then(() =>
+        ctx.prisma.status.delete(input)
+      )
+      return res;
     }),
 });
