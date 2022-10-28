@@ -6,7 +6,7 @@ export const Dashboard = () => {
   const statuses = trpc.tasks.getAllStatuses.useQuery();
 
   return (
-    <div className="fixed top-0 left-0 z-50 flex h-screen basis-10 flex-col items-center gap-2 bg-slate-600 py-3 px-2 shadow">
+    <div className="sticky top-0 left-0 z-50 flex h-screen basis-10 flex-col items-center gap-2 bg-slate-600 py-3 px-2 shadow">
       <DashGroup icon="S" title="Status List">
         <ul className="list-inside list-disc">
           {statuses.data?.map((status) => {

@@ -43,7 +43,7 @@ const Home: NextPage = () => {
         <meta name="description" content="WIP task manager web application" />
       </Head>
 
-      <main className="container flex min-h-screen min-w-full flex-col items-center justify-center">
+      <main className="container flex min-h-screen min-w-full flex-col items-center">
         <div className="flex">
           <Dashboard />
           <table className="mb-auto w-full table-fixed overflow-y-auto bg-slate-500">

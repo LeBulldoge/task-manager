@@ -52,7 +52,7 @@ export const TaskForm = (props: {
 
   return (
     <form
-      className={`flex h-36 w-36 flex-col bg-slate-600 p-2 shadow-black transition ease-in-out hover:translate-y-1 hover:scale-110 hover:drop-shadow-xl ${
+      className={`flex h-36 w-36 flex-col bg-slate-600 p-2 transition ease-in-out hover:translate-y-1 hover:scale-110 hover:shadow ${
         !isBeingDeleted || "animate-pulse"
       }`}
       onSubmit={handleOnSubmit}
