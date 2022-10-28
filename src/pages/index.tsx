@@ -7,6 +7,7 @@ import { trpc } from "@/utils/trpc";
 import Image from "next/future/image";
 import { AddButton } from "@/components/AddButton";
 import Head from "next/head";
+import { Dashboard } from "@/components/Dashboard";
 
 const Home: NextPage = () => {
   const [currentlyDragged, setCurrentlyDragged] = useState<HTMLElement | null>(
@@ -44,34 +45,9 @@ const Home: NextPage = () => {
 
       <main className="container flex min-h-screen min-w-full flex-col items-center justify-center">
         <div className="flex">
-          <div className="flex justify-center bg-slate-600 basis-10">
-            <div className="peer sticky top-0 flex flex-col place-self-start py-3 px-2">
-              <button className="px-2 rounded border border-slate-500 text-center">
-                S
-              </button>
-            </div>
-            <div className="group sticky top-0 min-h-screen w-0 place-self-start border-x border-x-slate-500 py-2 opacity-0 drop-shadow-2xl transition-all duration-75 ease-in peer-hover:w-96 peer-hover:px-2 peer-hover:opacity-100 peer-hover:duration-150">
-              <strong className="text-xl">Status List</strong>
-              <ul className="list-inside list-disc">
-                {statuses.data?.map((status) => {
-                  return (
-                    <li
-                      key={status.id.toString()}
-                      className="mb-4 border-b border-b-slate-500 text-slate-300"
-                    >
-                      <input
-                        type="text"
-                        defaultValue={status.name}
-                        className="bg-inherit text-white"
-                      />
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          </div>
+          <Dashboard />
           <table className="mb-auto w-full table-fixed overflow-y-auto bg-slate-500">
-            <thead className="sticky top-0 z-10 bg-slate-600 uppercase drop-shadow">
+            <thead className="sticky top-0 bg-slate-600 uppercase drop-shadow">
               <tr className="table-row">
                 {statuses.data?.map((status) => {
                   return (
