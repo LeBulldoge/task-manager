@@ -52,12 +52,12 @@ export const TaskForm = (props: {
 
   return (
     <form
-      className={`flex h-36 w-36 flex-col bg-slate-600 p-2 transition ease-in-out hover:translate-y-1 hover:scale-110 hover:shadow ${
+      className={`group flex h-36 w-36 flex-col bg-slate-600 p-2 transition ease-in-out hover:translate-y-1 hover:scale-110 hover:shadow ${
         !isBeingDeleted || "animate-pulse"
       }`}
       onSubmit={handleOnSubmit}
     >
-      <label className="text-xs flex flex-wrap justify-between">
+      <label className="flex flex-wrap justify-between text-xs">
         Title:
         <input
           type="button"
@@ -70,7 +70,7 @@ export const TaskForm = (props: {
 
             deleteTask.mutateAsync({ where: { id: props.task.id } });
           }}
-          className="h-4 w-4 rounded font-mono text-xs text-rose-300 hover:cursor-pointer hover:bg-slate-400"
+          className="h-4 w-4 rounded font-mono text-xs text-rose-300 opacity-0 transition ease-linear hover:cursor-pointer group-hover:opacity-100"
           value="x"
         />
         <input
@@ -122,7 +122,7 @@ export const TaskForm = (props: {
         />
         <input
           type="submit"
-          className="rounded border-slate-400 p-1 text-green-200 focus:border enabled:hover:cursor-pointer enabled:hover:bg-slate-500 disabled:text-slate-300"
+          className="rounded border-slate-400 p-1 text-blue-200 focus:border enabled:hover:cursor-pointer enabled:hover:bg-slate-500 disabled:text-slate-300"
           disabled={
             (props.task.name === name && props.task.statusId === statusId) ||
             isBeingDeleted
