@@ -57,23 +57,22 @@ export const TaskForm = (props: {
       }`}
       onSubmit={handleOnSubmit}
     >
-      <input
-        type="button"
-        disabled={isBeingDeleted}
-        onClick={async (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-
-          setIsBeingDeleted(true);
-
-          deleteTask.mutateAsync({ where: { id: props.task.id } });
-        }}
-        className="absolute h-4 w-4 place-self-end rounded font-mono text-xs text-rose-300 hover:cursor-pointer hover:bg-slate-400"
-        value="x"
-      />
-
-      <label className="text-xs">
+      <label className="text-xs flex flex-wrap justify-between">
         Title:
+        <input
+          type="button"
+          disabled={isBeingDeleted}
+          onClick={async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            setIsBeingDeleted(true);
+
+            deleteTask.mutateAsync({ where: { id: props.task.id } });
+          }}
+          className="h-4 w-4 rounded font-mono text-xs text-rose-300 hover:cursor-pointer hover:bg-slate-400"
+          value="x"
+        />
         <input
           type="text"
           value={name}
