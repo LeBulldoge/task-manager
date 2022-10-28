@@ -88,8 +88,8 @@ export const Dashboard = () => {
                   statusName: HTMLInputElement;
                 };
                 createStatus.mutateAsync({
-                  data: { name: element.statusName.value },
-                });
+                  data: { name: element.statusName.value, order: statuses.data?.length ?? 0 },
+                }).then(() => element.statusName.value = "");
               }}
             >
               <label>

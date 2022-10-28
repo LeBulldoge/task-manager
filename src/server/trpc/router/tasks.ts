@@ -32,6 +32,7 @@ const taskDeleteSchema: z.ZodType<Prisma.TaskDeleteArgs> = z.object({
 const statusCreateSchema: z.ZodType<Prisma.StatusCreateArgs> = z.object({
   data: z.object({
     name: z.string(),
+    order: z.number(),
   }),
 });
 
@@ -40,7 +41,8 @@ const statusUpdateSchema: z.ZodType<Prisma.StatusUpdateArgs> = z.object({
     id: z.number()
   }),
   data: z.object({
-    name: z.string(),
+    name: z.string().optional(),
+    order: z.number().optional(),
   }),
 });
 
@@ -74,7 +76,11 @@ export const taskRouter = router({
     }),
 
   getAllStatuses: publicProcedure.query(({ ctx }) => {
-    return ctx.prisma.status.findMany();
+    return ctx.prisma.status.findMany({
+      orderBy: {
+        order: "asc"
+      }
+    });
   }),
 
   createStatus: publicProcedure

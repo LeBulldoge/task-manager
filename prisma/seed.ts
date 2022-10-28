@@ -10,6 +10,7 @@ const main = async () => {
     update: {},
     create: {
       name: "Created",
+      order: 0,
       tasks: {
         create: {
           name: "Task A",
@@ -25,6 +26,7 @@ const main = async () => {
     update: {},
     create: {
       name: "In-progress",
+      order: 1,
       tasks: {
         create: {
           name: "Task B",
@@ -39,6 +41,7 @@ const main = async () => {
     },
     update: {},
     create: {
+      order: 2,
       name: "Finished",
       tasks: {
         create: {
