@@ -29,13 +29,30 @@ const taskDeleteSchema: z.ZodType<Prisma.TaskDeleteArgs> = z.object({
   }),
 });
 
+const statusCreateSchema: z.ZodType<Prisma.StatusCreateArgs> = z.object({
+  data: z.object({
+    name: z.string(),
+  }),
+});
+
+const statusUpdateSchema: z.ZodType<Prisma.StatusUpdateArgs> = z.object({
+  where: z.object({
+    id: z.number().optional(),
+  }),
+  data: z.object({
+    name: z.string(),
+  }),
+});
+
+const statusDeleteSchema: z.ZodType<Prisma.StatusDeleteArgs> = z.object({
+  where: z.object({
+    id: z.number(),
+  }),
+});
+
 export const taskRouter = router({
   getAllTasks: publicProcedure.query(({ ctx }) => {
     return ctx.prisma.task.findMany();
-  }),
-
-  getAllStatuses: publicProcedure.query(({ ctx }) => {
-    return ctx.prisma.status.findMany();
   }),
 
   createTask: publicProcedure
@@ -54,5 +71,27 @@ export const taskRouter = router({
     .input(taskDeleteSchema)
     .mutation(({ ctx, input }) => {
       return ctx.prisma.task.delete(input);
+    }),
+
+  getAllStatuses: publicProcedure.query(({ ctx }) => {
+    return ctx.prisma.status.findMany();
+  }),
+
+  createStatus: publicProcedure
+    .input(statusCreateSchema)
+    .mutation(({ctx, input}) => {
+    return ctx.prisma.status.create(input);
+  }),
+
+  updateStatus: publicProcedure
+    .input(statusUpdateSchema)
+    .mutation(({ ctx, input }) => {
+      return ctx.prisma.status.update(input);
+    }),
+
+  deleteStatus: publicProcedure
+    .input(statusDeleteSchema)
+    .mutation(({ ctx, input }) => {
+      return ctx.prisma.status.delete(input);
     }),
 });
