@@ -49,7 +49,8 @@ export const DashGroup = (props: {
   children: React.ReactNode;
 }) => {
   const drawer = useRef<HTMLDivElement>(null);
-  const classNames = ["translate-x-12", "px-2", "opacity-100"];
+  const classNamesShow = ["translate-x-12", "px-2"];
+  const classNamesHide = ["-translate-x-full", "opacity-0"];
 
   const [timeoutHandle, setTimeoutHandle] = useState<NodeJS.Timeout>();
 
@@ -80,14 +81,13 @@ export const DashGroup = (props: {
           const element = drawer.current;
           element.toggleAttribute("hidden");
           element.offsetHeight; // hack to trigger reflow
-          classNames.forEach((name) => {
-            if (!element.hidden) {
-              element.classList.add(name);
-            } else {
-              element.classList.remove(name);
-            }
-          });
-        }}
+          if (!element.hidden) {
+            classNamesHide.forEach((name) => element.classList.remove(name))
+            classNamesShow.forEach((name) => element.classList.add(name))
+          } else {
+            classNamesShow.forEach((name) => element.classList.remove(name))
+            classNamesHide.forEach((name) => element.classList.add(name))
+        }}}
       />
       <div
         ref={drawer}
