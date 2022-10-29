@@ -13,7 +13,7 @@ export const TaskForm = (props: {
 
   const utils = trpc.useContext();
   const updateTask = trpc.tasks.updateTask.useMutation({
-    async onSuccess(task) {
+    async onSuccess() {
       utils.tasks.invalidate();
     },
   });

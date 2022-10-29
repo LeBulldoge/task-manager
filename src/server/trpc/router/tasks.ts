@@ -38,7 +38,7 @@ const statusCreateSchema: z.ZodType<Prisma.StatusCreateArgs> = z.object({
 
 const statusUpdateSchema: z.ZodType<Prisma.StatusUpdateArgs> = z.object({
   where: z.object({
-    id: z.number()
+    id: z.number(),
   }),
   data: z.object({
     name: z.string().optional(),
@@ -75,13 +75,18 @@ export const taskRouter = router({
       return ctx.prisma.task.delete(input);
     }),
 
-  getAllStatuses: publicProcedure.query(({ ctx }) => {
-    return ctx.prisma.status.findMany({
-      orderBy: {
-        order: "asc"
-      }
-    });
-  }),
+  getAllStatuses: publicProcedure
+    .input(z.object({ includeTasks: z.boolean().optional() }))
+    .query(({ ctx, input }) => {
+      return ctx.prisma.status.findMany({
+        include: {
+          tasks: input.includeTasks,
+        },
+        orderBy: {
+          order: "asc",
+        },
+      });
+    }),
 
   createStatus: publicProcedure
     .input(statusCreateSchema)
@@ -98,13 +103,13 @@ export const taskRouter = router({
   deleteStatus: publicProcedure
     .input(statusDeleteSchema)
     .mutation(({ ctx, input }) => {
-      const res = ctx.prisma.task.deleteMany({
-        where: {
-          statusId: input.where.id
-        }
-      }).then(() =>
-        ctx.prisma.status.delete(input)
-      )
+      const res = ctx.prisma.task
+        .deleteMany({
+          where: {
+            statusId: input.where.id,
+          },
+        })
+        .then(() => ctx.prisma.status.delete(input));
       return res;
     }),
 });

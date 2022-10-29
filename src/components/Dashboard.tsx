@@ -5,7 +5,7 @@ import { MdHistory } from "react-icons/md";
 
 export const Dashboard = () => {
   const utils = trpc.useContext();
-  const statuses = trpc.tasks.getAllStatuses.useQuery();
+  const statuses = trpc.tasks.getAllStatuses.useQuery({});
 
   const invalidate = {
     async onSuccess() {

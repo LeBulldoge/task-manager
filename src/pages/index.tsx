@@ -1,12 +1,14 @@
 import type { NextPage } from "next";
 import { useState } from "react";
 
+import Image from "next/future/image";
+import Head from "next/head";
+
+import { trpc } from "@/utils/trpc";
+
 import { Dropzone, Draggable } from "@/components/Draggable";
 import { TaskForm } from "@/components/TaskForm";
-import { trpc } from "@/utils/trpc";
-import Image from "next/future/image";
 import { AddButton } from "@/components/AddButton";
-import Head from "next/head";
 import { Dashboard } from "@/components/Dashboard";
 
 const Home: NextPage = () => {
@@ -17,8 +19,8 @@ const Home: NextPage = () => {
   const [isEditing, setIsEditing] = useState(false);
 
   const utils = trpc.useContext();
-  const tasks = trpc.tasks.getAllTasks.useQuery();
-  const statuses = trpc.tasks.getAllStatuses.useQuery();
+  //const tasks = trpc.tasks.getAllTasks.useQuery();
+  const statuses = trpc.tasks.getAllStatuses.useQuery({includeTasks: true});
 
   const createTask = trpc.tasks.createTask.useMutation({
     async onSuccess() {
@@ -72,8 +74,7 @@ const Home: NextPage = () => {
                       dragged={currentlyDragged}
                       className="flex flex-wrap items-center justify-center gap-2 px-2 py-4"
                     >
-                      {tasks.data
-                        ?.filter((task) => task.statusId == status.id)
+                      {status.tasks
                         .map((task) => {
                           return (
                             <Draggable
