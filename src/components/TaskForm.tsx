@@ -14,9 +14,7 @@ export const TaskForm = (props: {
   const utils = trpc.useContext();
   const updateTask = trpc.tasks.updateTask.useMutation({
     async onSuccess(task) {
-      if (task.statusId != props.task.statusId) {
-        utils.tasks.invalidate();
-      }
+      utils.tasks.invalidate();
     },
   });
 
