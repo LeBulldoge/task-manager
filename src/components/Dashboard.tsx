@@ -30,7 +30,7 @@ export const Dashboard = () => {
   };
 
   return (
-    <div className="sticky top-0 left-0 z-50 flex h-screen basis-10 flex-col items-center gap-2 bg-slate-600 py-3 px-2 shadow">
+    <div className="sticky top-0 left-0 bottom-0 z-50 flex min-h-screen basis-10 flex-col items-center gap-2 bg-slate-600 py-3 px-2 shadow">
       <DashGroup title="Status List" icon={MdHistory}>
         <ul className="list-inside list-disc">
           {statuses.data?.map((status) => {
@@ -126,7 +126,7 @@ export const DashButton = (props: {
       className="group/button z-10 flex h-8 w-8 items-center justify-center rounded-2xl border border-slate-500 bg-blue-400 text-center transition-all ease-linear group-hover:rounded-lg group-hover:bg-blue-300"
       onClick={props.onClick}
     >
-      <div className="fixed w-auto translate-x-20 overflow-clip rounded border border-slate-500 p-1 bg-slate-700 opacity-0 group-hover/button:delay-300 transition group-hover/button:opacity-75">
+      <div className="fixed w-auto translate-x-20 overflow-clip rounded border border-slate-500 bg-slate-700 p-1 opacity-0 transition group-hover/button:opacity-75 group-hover/button:delay-300">
         {props.tooltip}
       </div>
       {props.children}
@@ -189,7 +189,7 @@ export const DashGroup = (props: {
       <div
         ref={drawer}
         hidden={true}
-        className="fixed top-0 left-0 bottom-0 flex -translate-x-full flex-col border-x border-slate-500 bg-slate-600 py-3 opacity-0 shadow transition-all duration-300 ease-in"
+        className="fixed top-0 left-0 bottom-0 right-12 flex -translate-x-full flex-col border-x border-slate-500 bg-slate-600 py-3 opacity-0 shadow transition-all duration-300 ease-in md:right-auto"
       >
         <strong className="mb-5 w-full border-b border-slate-400 text-center text-2xl hover:cursor-default">
           {props.title}
