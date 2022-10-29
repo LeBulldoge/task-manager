@@ -1,5 +1,7 @@
 import { trpc } from "@/utils/trpc";
 import { ChangeEvent, useRef, useState } from "react";
+import { IconType } from "react-icons";
+import { MdHistory } from "react-icons/md";
 
 export const Dashboard = () => {
   const utils = trpc.useContext();
@@ -29,7 +31,7 @@ export const Dashboard = () => {
 
   return (
     <div className="sticky top-0 left-0 z-50 flex h-screen basis-10 flex-col items-center gap-2 bg-slate-600 py-3 px-2 shadow">
-      <DashGroup icon="S" title="Status List">
+      <DashGroup title="Status List" icon={MdHistory}>
         <ul className="list-inside list-disc">
           {statuses.data?.map((status) => {
             return (
@@ -54,7 +56,7 @@ export const Dashboard = () => {
                       e.currentTarget as typeof e.currentTarget & {
                         statusName: HTMLInputElement;
                       };
-                    element.statusName.value = element.statusName.defaultValue
+                    element.statusName.value = element.statusName.defaultValue;
                   }}
                 >
                   <input
@@ -67,7 +69,7 @@ export const Dashboard = () => {
                   <input
                     type="button"
                     value="x"
-                    className="text-rose-200 font-mono opacity-0 transition-all ease-linear hover:cursor-pointer group-hover/item:opacity-100"
+                    className="font-mono text-rose-200 opacity-0 transition-all ease-linear hover:cursor-pointer group-hover/item:opacity-100"
                     onClick={() => {
                       deleteStatus.mutateAsync({ where: { id: status.id } });
                     }}
@@ -87,9 +89,14 @@ export const Dashboard = () => {
                 const element = e.currentTarget as typeof e.currentTarget & {
                   statusName: HTMLInputElement;
                 };
-                createStatus.mutateAsync({
-                  data: { name: element.statusName.value, order: statuses.data?.length ?? 0 },
-                }).then(() => element.statusName.value = "");
+                createStatus
+                  .mutateAsync({
+                    data: {
+                      name: element.statusName.value,
+                      order: statuses.data?.length ?? 0,
+                    },
+                  })
+                  .then(() => (element.statusName.value = ""));
               }}
             >
               <label>
@@ -110,21 +117,25 @@ export const Dashboard = () => {
 };
 
 export const DashButton = (props: {
-  text: string;
+  tooltip: string;
+  children: React.ReactNode;
   onClick: React.MouseEventHandler;
 }) => {
   return (
     <button
-      className="z-10 h-8 w-8 overflow-clip rounded-2xl border border-slate-500 bg-blue-400 px-2 text-center transition-all ease-linear group-hover:rounded-lg group-hover:bg-blue-300"
+      className="group/button z-10 flex h-8 w-8 items-center justify-center rounded-2xl border border-slate-500 bg-blue-400 text-center transition-all ease-linear group-hover:rounded-lg group-hover:bg-blue-300"
       onClick={props.onClick}
     >
-      {props.text}
+      <div className="fixed w-auto translate-x-20 overflow-clip rounded border border-slate-500 p-1 bg-slate-700 opacity-0 group-hover/button:delay-300 transition group-hover/button:opacity-75">
+        {props.tooltip}
+      </div>
+      {props.children}
     </button>
   );
 };
 
 export const DashGroup = (props: {
-  icon: string;
+  icon: IconType;
   title: string;
   children: React.ReactNode;
 }) => {
@@ -155,7 +166,7 @@ export const DashGroup = (props: {
       }}
     >
       <DashButton
-        text={props.icon}
+        tooltip={props.title}
         onClick={() => {
           if (!drawer.current) return;
           const element = drawer.current;
@@ -169,7 +180,12 @@ export const DashGroup = (props: {
             classNamesHide.forEach((name) => element.classList.add(name));
           }
         }}
-      />
+      >
+        <props.icon
+          size={24}
+          className="text-blue-100 transition ease-linear group-hover/button:scale-110"
+        />
+      </DashButton>
       <div
         ref={drawer}
         hidden={true}
