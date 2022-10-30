@@ -19,10 +19,17 @@ const Home: NextPage = () => {
   const [isEditing, setIsEditing] = useState(false);
 
   const utils = trpc.useContext();
-  //const tasks = trpc.tasks.getAllTasks.useQuery();
-  const statuses = trpc.tasks.getAllStatuses.useQuery({ includeTasks: true });
+  const statusQuery = trpc.tasks.getAllStatuses.useQuery({
+    includeTasks: true,
+  });
 
   const createTask = trpc.tasks.createTask.useMutation({
+    async onSuccess() {
+      await utils.tasks.invalidate();
+    },
+  });
+
+  const updateTask = trpc.tasks.updateTask.useMutation({
     async onSuccess() {
       await utils.tasks.invalidate();
     },
@@ -54,7 +61,7 @@ const Home: NextPage = () => {
         <table className="mb-auto w-auto table-fixed overflow-x-scroll bg-slate-500 md:w-full">
           <thead className="sticky top-0 bg-slate-600 uppercase drop-shadow">
             <tr className="table-row">
-              {statuses.data?.map((status) => {
+              {statusQuery.data?.map((status) => {
                 return (
                   <th key={status.id.toString()} className="w-1/12 py-3 px-6">
                     {status.name}
@@ -65,7 +72,7 @@ const Home: NextPage = () => {
           </thead>
           <tbody>
             <tr>
-              {statuses.data?.map((status) => {
+              {statusQuery.data?.map((status) => {
                 return (
                   <td
                     key={status.id.toString()}
@@ -73,19 +80,31 @@ const Home: NextPage = () => {
                     className="align-top"
                   >
                     <Dropzone
-                      dragged={currentlyDragged}
                       className="flex flex-wrap items-center justify-center gap-2 px-2 py-4"
+                      dragged={currentlyDragged}
+                      onDrop={() => {
+                        if (!currentlyDragged) return;
+                        updateTask.mutate({
+                          where: {
+                            id: Number.parseInt(currentlyDragged.id),
+                          },
+                          data: {
+                            statusId: status.id,
+                          },
+                        });
+                      }}
                     >
                       {status.tasks.map((task) => {
                         return (
                           <Draggable
+                            id={task.id.toString()}
                             key={task.id}
                             disable={isEditing}
                             setDragged={setCurrentlyDragged}
                           >
                             <TaskForm
                               task={task}
-                              statuses={statuses.data}
+                              statuses={statusQuery.data}
                               onEdit={setIsEditing}
                             />
                           </Draggable>

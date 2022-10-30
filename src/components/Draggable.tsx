@@ -1,12 +1,15 @@
 import { useRef } from "react";
+import type { DragEventHandler } from "react";
 
 export const Draggable = (props: {
+  id: string;
   children?: React.ReactNode;
   setDragged: (element: HTMLElement | null) => void;
   disable: boolean;
 }) => {
   return (
     <div
+      id={props.id}
       onDragStart={(e) => {
         if (props.disable) {
           e.preventDefault();
@@ -29,8 +32,9 @@ export const Draggable = (props: {
 export const Dropzone = (props: {
   id?: string;
   children?: React.ReactNode;
-  dragged: HTMLElement | null;
   className?: string;
+  dragged: HTMLElement | null;
+  onDrop?: DragEventHandler;
 }) => {
   const self = useRef<HTMLDivElement>(null);
   return (
@@ -47,8 +51,7 @@ export const Dropzone = (props: {
 
         const element = e.currentTarget;
         if (props.dragged && !element.contains(props.dragged)) {
-          // TODO: figure out how to communicate with children
-          element.prepend(props.dragged);
+          props.onDrop?.(e)
         }
       }}
       className={`${props.className} transition-all duration-200 ease-out ${
