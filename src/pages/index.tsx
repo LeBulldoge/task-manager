@@ -20,7 +20,7 @@ const Home: NextPage = () => {
 
   const utils = trpc.useContext();
   //const tasks = trpc.tasks.getAllTasks.useQuery();
-  const statuses = trpc.tasks.getAllStatuses.useQuery({includeTasks: true});
+  const statuses = trpc.tasks.getAllStatuses.useQuery({ includeTasks: true });
 
   const createTask = trpc.tasks.createTask.useMutation({
     async onSuccess() {
@@ -48,8 +48,10 @@ const Home: NextPage = () => {
       </Head>
 
       <main className="flex min-h-screen min-w-full">
-        <Dashboard />
-        <table className="mb-auto w-auto overflow-x-scroll md:w-full table-fixed bg-slate-500">
+        <div>
+          <Dashboard />
+        </div>
+        <table className="mb-auto w-auto table-fixed overflow-x-scroll bg-slate-500 md:w-full">
           <thead className="sticky top-0 bg-slate-600 uppercase drop-shadow">
             <tr className="table-row">
               {statuses.data?.map((status) => {
@@ -74,22 +76,21 @@ const Home: NextPage = () => {
                       dragged={currentlyDragged}
                       className="flex flex-wrap items-center justify-center gap-2 px-2 py-4"
                     >
-                      {status.tasks
-                        .map((task) => {
-                          return (
-                            <Draggable
-                              key={task.id}
-                              disable={isEditing}
-                              setDragged={setCurrentlyDragged}
-                            >
-                              <TaskForm
-                                task={task}
-                                statuses={statuses.data}
-                                onEdit={setIsEditing}
-                              />
-                            </Draggable>
-                          );
-                        })}
+                      {status.tasks.map((task) => {
+                        return (
+                          <Draggable
+                            key={task.id}
+                            disable={isEditing}
+                            setDragged={setCurrentlyDragged}
+                          >
+                            <TaskForm
+                              task={task}
+                              statuses={statuses.data}
+                              onEdit={setIsEditing}
+                            />
+                          </Draggable>
+                        );
+                      })}
                       <AddButton
                         disabled={isAddingCell}
                         onClick={async () => handleAddTask(status.id)}
