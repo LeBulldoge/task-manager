@@ -4,7 +4,6 @@ import { TaskForm } from "./TaskForm";
 export const TaskCard = (props: {
   task: Task;
   statuses: Status[];
-  onEdit?: (isEditing: boolean) => void;
 }) => {
   return (
     <div className="relative">

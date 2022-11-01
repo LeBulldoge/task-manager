@@ -2,10 +2,19 @@ import { trpc } from "@/utils/trpc";
 import { Status, Task } from "@prisma/client";
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 
-export const TaskForm = (props: { task: Task; statuses: Status[] }) => {
-  const [isBeingDeleted, setIsBeingDeleted] = useState(false);
-  const [isDateOpen, setIsDateOpen] = useState(0);
+type TaskForm = HTMLFormElement & {
+  name: HTMLInputElement;
+  statusId: HTMLInputElement;
+  description: HTMLTextAreaElement;
+};
+
+export const TaskForm = (props: {
+  task: Task;
+  statuses: Status[];
+}) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isBeingDeleted, setIsBeingDeleted] = useState(false);
+  const [openDateIndex, setOpenDateIndex] = useState(0);
 
   const utils = trpc.useContext();
   const updateTask = trpc.tasks.updateTask.useMutation({
@@ -38,37 +47,36 @@ export const TaskForm = (props: { task: Task; statuses: Status[] }) => {
             props.statuses.find((s) => s.id === props.task.statusId)?.name ?? ""
           );
         case "description":
-          return props.task.description;
+          return props.task.description ?? "";
         case "name":
           return props.task.name;
       }
     };
 
-    const result = element.value != getDefValue();
-    element.dataset["edited"] = String(result);
+    element.dataset["edited"] = String(element.value !== getDefValue());
   };
 
-  const handleOnSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  const handleOnSubmit = async (event: FormEvent<TaskForm>) => {
     event.preventDefault();
-    const element = event.currentTarget as HTMLFormElement & {
-      name: HTMLInputElement;
-      statusId: HTMLInputElement;
-      description: HTMLTextAreaElement;
-    };
+    const form = event.currentTarget;
 
     const statusId =
-      props.statuses.find((s) => s.name === element.statusId.value)?.id ?? 0;
+      props.statuses.find((s) => s.name === form.statusId.value)?.id ?? 0;
 
-    updateTask.mutate({
-      where: { id: props.task.id },
-      data: {
-        name: element.name.value,
-        statusId: statusId,
-        description: element.description.value,
-      },
-    });
-
-    setIsExpanded(false);
+    updateTask
+      .mutateAsync({
+        where: { id: props.task.id },
+        data: {
+          name: form.name.value,
+          statusId: statusId,
+          description: form.description.value,
+        },
+      })
+      .then(() => {
+        form.name.dataset["edited"] = "false";
+        form.statusId.dataset["edited"] = "false";
+        form.description.dataset["edited"] = "false";
+      });
   };
 
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -78,9 +86,9 @@ export const TaskForm = (props: { task: Task; statuses: Status[] }) => {
 
   return (
     <div
-      className={`top-0 left-0 right-0 bottom-0 ${
+      className={`top-0 left-0 right-0 bottom-0 transition-colors duration-200 ease-linear ${
         isExpanded
-          ? `fixed z-50 bg-transparent p-8 backdrop-blur-0 transition-colors duration-200 ease-linear hover:cursor-auto md:p-16 ${
+          ? `fixed z-50 bg-transparent p-8 backdrop-blur-0 hover:cursor-auto md:p-16 ${
               isTransitioning
                 ? "bg-slate-700/50 backdrop-blur-sm"
                 : "backdrop-blur-0"
@@ -92,14 +100,12 @@ export const TaskForm = (props: { task: Task; statuses: Status[] }) => {
       }}
     >
       <form
-        className="group flex h-full w-full flex-col overflow-scroll rounded-xl bg-slate-600 p-4 shadow-xl transition duration-200 ease-out"
+        data-expanded={isExpanded}
+        className="group flex h-full w-full flex-col overflow-scroll rounded-xl bg-slate-600 p-2 shadow-xl transition duration-200 ease-out data-[expanded=true]:p-4"
         onSubmit={handleOnSubmit}
       >
-        <div
-          data-expanded={isExpanded}
-          className="grid grid-flow-col grid-cols-6 grid-rows-3 overflow-hidden data-[expanded=false]:grid-cols-1 data-[expanded=false]:grid-rows-2 data-[expanded=true]:gap-5 md:grid-cols-5 md:grid-rows-2"
-        >
-          <label className="col-span-4 text-xs md:col-span-3">
+        <div className="grid grid-flow-col grid-cols-6 grid-rows-3 gap-3 overflow-hidden group-data-[expanded=false]:grid-cols-1 group-data-[expanded=false]:grid-rows-2 group-data-[expanded=true]:gap-5 md:grid-cols-5 md:grid-rows-2">
+          <label className="col-span-5 text-xs md:col-span-3">
             Title:
             <input
               name="name"
@@ -109,10 +115,10 @@ export const TaskForm = (props: { task: Task; statuses: Status[] }) => {
               required={true}
               disabled={isBeingDeleted}
               onChange={handleOnChange}
-              className="w-full rounded border border-transparent border-b-slate-500 data-[edited=true]:border-orange-300/50 bg-transparent px-2 text-base focus:border-b-slate-400"
+              className="w-full rounded border border-transparent border-b-slate-500 bg-transparent px-2 text-base focus:border-b-slate-400 data-[edited=true]:border-orange-300/50"
             />
           </label>
-          <label className="col-span-4 text-xs md:col-span-3">
+          <label className="col-span-5 text-xs md:col-span-3">
             Status:
             <select
               name="statusId"
@@ -122,7 +128,7 @@ export const TaskForm = (props: { task: Task; statuses: Status[] }) => {
               }
               disabled={isBeingDeleted}
               onChange={handleOnChange}
-              className="w-full rounded border border-transparent data-[edited=true]:border-orange-300/50 border-b-slate-500 bg-transparent px-1 text-base capitalize"
+              className="w-full rounded border border-transparent border-b-slate-500 bg-transparent px-1 text-base capitalize data-[edited=true]:border-orange-300/50"
             >
               {props.statuses.map((status) => {
                 return (
@@ -135,13 +141,13 @@ export const TaskForm = (props: { task: Task; statuses: Status[] }) => {
             <>
               <details
                 className="col-span-3 md:col-span-1"
-                open={isDateOpen === 0}
+                open={openDateIndex === 0}
               >
                 <summary
                   className="text-xs leading-6 hover:cursor-pointer"
                   onClick={(e) => {
                     e.preventDefault();
-                    setIsDateOpen(0);
+                    setOpenDateIndex(0);
                   }}
                 >
                   Created at:
@@ -152,13 +158,13 @@ export const TaskForm = (props: { task: Task; statuses: Status[] }) => {
               </details>
               <details
                 className="col-span-3 md:col-span-1"
-                open={isDateOpen === 1}
+                open={openDateIndex === 1}
               >
                 <summary
                   className="text-xs leading-6 hover:cursor-pointer"
                   onClick={(e) => {
                     e.preventDefault();
-                    setIsDateOpen(1);
+                    setOpenDateIndex(1);
                   }}
                 >
                   Updated at:
@@ -188,7 +194,7 @@ export const TaskForm = (props: { task: Task; statuses: Status[] }) => {
               defaultValue={props.task.description ?? ""}
               disabled={isBeingDeleted}
               onChange={handleOnChange}
-              className="h-full m-2 w-full rounded border data-[edited=true]:border-orange-300/50  border-slate-500 bg-transparent px-1 text-base"
+              className="mt-2 h-full w-full rounded border border-slate-500 bg-transparent p-2 text-base data-[edited=true]:border-orange-300/50"
             />
           </label>
         )}

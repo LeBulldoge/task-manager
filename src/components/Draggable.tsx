@@ -5,7 +5,6 @@ export const Draggable = (props: {
   id: string;
   children?: React.ReactNode;
   setDragged: (element: HTMLElement | null) => void;
-  disable: boolean;
 }) => {
   return (
     <div
