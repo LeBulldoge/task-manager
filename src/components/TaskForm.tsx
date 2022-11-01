@@ -67,7 +67,7 @@ export const TaskForm = (props: {
     const statusId =
       props.statuses.find((s) => s.name === element.statusId.value)?.id ?? 0;
 
-    updateTask.mutateAsync({
+    updateTask.mutate({
       where: { id: props.task.id },
       data: {
         name: element.name.value,
@@ -99,8 +99,34 @@ export const TaskForm = (props: {
         }`}
         onSubmit={handleOnSubmit}
       >
-        <label className="flex flex-wrap justify-between text-xs">
-          Title:
+        <div className="flex flex-wrap justify-between gap-10 ">
+          <label className="grow text-xs">
+            Title:
+            <input
+              name="name"
+              autoFocus
+              type="text"
+              defaultValue={props.task.name}
+              required={true}
+              disabled={isBeingDeleted}
+              onChange={handleOnChange}
+              onFocus={() => props.onEdit?.(true)}
+              onBlur={() => props.onEdit?.(false)}
+              className="mb-2 w-full rounded border border-transparent border-b-slate-500 bg-transparent px-2 text-base focus:border-b-slate-400"
+            />
+          </label>
+          <label className="text-xs">
+            Created at:
+            <p className="mb-2 w-full rounded border border-transparent border-b-slate-500 bg-transparent px-2 text-base">
+              {props.task.createdAt.toLocaleString()}
+            </p>
+          </label>
+          <label className="text-xs">
+            Updated at:
+            <p className="mb-2 w-full rounded border border-transparent border-b-slate-500 bg-transparent px-2 text-base">
+              {props.task.updatedAt.toLocaleString()}
+            </p>
+          </label>
           <input
             type="button"
             disabled={isBeingDeleted}
@@ -110,19 +136,7 @@ export const TaskForm = (props: {
             className="h-4 w-4 rounded font-mono text-xs text-rose-300 opacity-0 transition duration-300 ease-linear hover:cursor-pointer group-hover:opacity-100"
             value="x"
           />
-          <input
-            name="name"
-            autoFocus
-            type="text"
-            defaultValue={props.task.name}
-            required={true}
-            disabled={isBeingDeleted}
-            onChange={handleOnChange}
-            onFocus={() => props.onEdit?.(true)}
-            onBlur={() => props.onEdit?.(false)}
-            className="mb-2 w-full rounded border border-transparent border-b-slate-500 bg-transparent px-2 text-base focus:border-b-slate-400"
-          />
-        </label>
+        </div>
         <label className="text-xs">
           Status:
           <select
@@ -163,8 +177,8 @@ export const TaskForm = (props: {
             className="rounded border-slate-400 p-1 text-rose-200 focus:border enabled:hover:cursor-pointer enabled:hover:bg-slate-500 disabled:text-slate-300"
             disabled={isBeingDeleted}
             onClick={() => {
-              setIsBeingDeleted(true)
-              deleteTask.mutate({ where: { id: props.task.id } })
+              setIsBeingDeleted(true);
+              deleteTask.mutate({ where: { id: props.task.id } });
             }}
           />
           <input
