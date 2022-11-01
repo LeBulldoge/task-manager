@@ -96,7 +96,7 @@ export const Dashboard = () => {
                     name="statusName"
                     type="text"
                     defaultValue={status.name}
-                    className="w-full flex-grow bg-inherit transition-colors ease-linear rounded border border-transparent invalid:border-rose-400"
+                    className="w-full flex-grow rounded border border-transparent bg-inherit transition-colors ease-linear invalid:border-rose-400"
                     onChange={statusNameValidation}
                   />
                   <input
@@ -137,7 +137,7 @@ export const Dashboard = () => {
                   name="statusName"
                   type="text"
                   placeholder="Add a new status..."
-                  className="bg-inherit text-white transition-colors ease-linear rounded border border-transparent invalid:border-rose-400"
+                  className="rounded border border-transparent bg-inherit text-white transition-colors ease-linear invalid:border-rose-400"
                   onChange={statusNameValidation}
                 />
               </label>

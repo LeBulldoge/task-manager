@@ -37,7 +37,7 @@ const main = async () => {
 
   const finished = await prisma.status.upsert({
     where: {
-      name: "Finished"
+      name: "Finished",
     },
     update: {},
     create: {

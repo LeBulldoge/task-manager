@@ -77,7 +77,7 @@ const Home: NextPage = () => {
                   <td
                     key={status.id.toString()}
                     id={status.id.toString()}
-                    className="align-top border-x-2 border-slate-600 border-collapse"
+                    className="border-collapse border-x-2 border-slate-600 align-top"
                   >
                     <Dropzone
                       className="flex flex-wrap items-center justify-center gap-2 px-2 py-4"

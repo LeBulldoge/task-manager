@@ -8,7 +8,8 @@ import type { AppRouter } from "@/server/trpc/router/_app";
 
 const getBaseUrl = () => {
   if (typeof window !== "undefined") return ""; // browser should use relative url
-  if (process.env.RAILWAY_STATIC_URL) return `https://${process.env.RAILWAY_STATIC_URL}`; // SSR should use public url
+  if (process.env.RAILWAY_STATIC_URL)
+    return `https://${process.env.RAILWAY_STATIC_URL}`; // SSR should use public url
   return `http://localhost:${process.env.PORT ?? 3000}`; // dev SSR should use localhost
 };
 

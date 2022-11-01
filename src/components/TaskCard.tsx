@@ -53,7 +53,7 @@ export const TaskCard = (props: {
   return (
     <>
       <form
-        className={`group flex h-36 w-36 flex-col bg-slate-600 rounded-xl p-2 transition ease-in-out hover:translate-y-1 hover:scale-110 hover:shadow ${
+        className={`group flex h-36 w-36 flex-col rounded-xl bg-slate-600 p-2 transition ease-in-out hover:translate-y-1 hover:scale-110 hover:shadow ${
           !isBeingDeleted || "animate-pulse"
         }`}
         onSubmit={handleOnSubmit}
@@ -124,11 +124,11 @@ export const TaskCard = (props: {
           <input
             type="button"
             className="rounded border-slate-400 p-1 text-blue-200 focus:border enabled:hover:cursor-pointer enabled:hover:bg-slate-500 disabled:text-slate-300"
-            disabled={
-              isBeingDeleted
-            }
+            disabled={isBeingDeleted}
             value="Edit"
-            onClick={() => { setIsFormShown(!isFormShown)}}
+            onClick={() => {
+              setIsFormShown(!isFormShown);
+            }}
           />
         </div>
       </form>

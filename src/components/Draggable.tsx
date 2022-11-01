@@ -51,7 +51,7 @@ export const Dropzone = (props: {
 
         const element = e.currentTarget;
         if (props.dragged && !element.contains(props.dragged)) {
-          props.onDrop?.(e)
+          props.onDrop?.(e);
         }
       }}
       className={`${props.className} transition-all duration-200 ease-out ${
