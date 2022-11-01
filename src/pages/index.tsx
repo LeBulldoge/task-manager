@@ -59,7 +59,7 @@ const Home: NextPage = () => {
           <Dashboard />
         </div>
         <table className="mb-auto w-auto table-fixed overflow-x-scroll bg-slate-500 md:w-full">
-          <thead className="sticky top-0 bg-slate-600 uppercase drop-shadow">
+          <thead className="sticky z-10 top-0 bg-slate-600 uppercase drop-shadow">
             <tr className="h-12">
               {statusQuery.data?.map((status) => {
                 return (
