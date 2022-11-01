@@ -128,6 +128,7 @@ export const TaskCard = (props: {
             value="Edit"
             onClick={() => {
               setIsFormShown(!isFormShown);
+              props.onEdit?.(!isFormShown);
             }}
           />
         </div>

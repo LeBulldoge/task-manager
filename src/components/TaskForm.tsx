@@ -5,10 +5,10 @@ import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 export const TaskForm = (props: {
   task: Task;
   statuses: Status[];
-  onEdit?: (isEditing: boolean) => void;
   setIsShown: (isShown: boolean) => void;
 }) => {
   const [isBeingDeleted, setIsBeingDeleted] = useState(false);
+  const [isDateOpen, setIsDateOpen] = useState(0);
 
   const utils = trpc.useContext();
   const updateTask = trpc.tasks.updateTask.useMutation({
@@ -86,7 +86,7 @@ export const TaskForm = (props: {
 
   return (
     <div
-      className={`fixed top-0 left-0 right-0 bottom-0 z-50 bg-transparent p-16 backdrop-blur-0 transition-all duration-200 ease-linear hover:cursor-auto ${
+      className={`fixed top-0 left-0 right-0 bottom-0 z-50 bg-transparent p-8 backdrop-blur-0 transition-all duration-200 ease-linear hover:cursor-auto md:p-16 ${
         isTransitioning ? "bg-slate-700/50 backdrop-blur-sm" : "backdrop-blur-0"
       }`}
       onClick={(e) => {
@@ -99,8 +99,8 @@ export const TaskForm = (props: {
         }`}
         onSubmit={handleOnSubmit}
       >
-        <div className="flex flex-wrap justify-between gap-10 ">
-          <label className="grow text-xs">
+        <div className="grid grid-flow-col grid-cols-6 grid-rows-3 gap-5 md:grid-cols-5 md:grid-rows-2 md:gap-10">
+          <label className="col-span-5 md:col-span-3 text-xs">
             Title:
             <input
               name="name"
@@ -110,50 +110,67 @@ export const TaskForm = (props: {
               required={true}
               disabled={isBeingDeleted}
               onChange={handleOnChange}
-              onFocus={() => props.onEdit?.(true)}
-              onBlur={() => props.onEdit?.(false)}
-              className="mb-2 w-full rounded border border-transparent border-b-slate-500 bg-transparent px-2 text-base focus:border-b-slate-400"
+              className="w-full rounded border border-transparent border-b-slate-500 bg-transparent px-2 text-base focus:border-b-slate-400"
             />
           </label>
-          <label className="text-xs">
-            Created at:
-            <p className="mb-2 w-full rounded border border-transparent border-b-slate-500 bg-transparent px-2 text-base">
+          <label className="col-span-5 md:col-span-3 text-xs">
+            Status:
+            <select
+              name="statusId"
+              defaultValue={
+                props.statuses.find((s) => s.id === props.task.statusId)
+                  ?.name ?? 0
+              }
+              disabled={isBeingDeleted}
+              onChange={handleOnChange}
+              className="w-full rounded border border-transparent border-b-slate-500 bg-transparent px-1 text-base capitalize"
+            >
+              {props.statuses.map((status) => {
+                return (
+                  <option key={status.id.toString()}>{status.name}</option>
+                );
+              })}
+            </select>
+          </label>
+          <details className="col-span-3 md:col-span-1" open={isDateOpen === 0}>
+            <summary
+              className="text-xs leading-6 hover:cursor-pointer"
+              onClick={(e) => {
+                e.preventDefault();
+                setIsDateOpen(0);
+              }}
+            >
+              Created at:
+            </summary>
+            <div className="px-2 text-sm">
               {props.task.createdAt.toLocaleString()}
-            </p>
-          </label>
-          <label className="text-xs">
-            Updated at:
-            <p className="mb-2 w-full rounded border border-transparent border-b-slate-500 bg-transparent px-2 text-base">
+            </div>
+          </details>
+          <details className="col-span-3 md:col-span-1" open={isDateOpen === 1}>
+            <summary
+              className="text-xs leading-6 hover:cursor-pointer"
+              onClick={(e) => {
+                e.preventDefault();
+                setIsDateOpen(1);
+              }}
+            >
+              Updated at:
+            </summary>
+            <div className="px-2 text-sm">
               {props.task.updatedAt.toLocaleString()}
-            </p>
-          </label>
+            </div>
+          </details>
           <input
             type="button"
             disabled={isBeingDeleted}
             onClick={() => {
               props.setIsShown(false);
             }}
-            className="h-4 w-4 rounded font-mono text-xs text-rose-300 opacity-0 transition duration-300 ease-linear hover:cursor-pointer group-hover:opacity-100"
+            className="h-4 w-4 place-self-end self-start rounded font-mono text-xs text-rose-300 opacity-0 transition duration-300 ease-linear hover:cursor-pointer group-hover:opacity-100"
             value="x"
           />
         </div>
-        <label className="text-xs">
-          Status:
-          <select
-            name="statusId"
-            defaultValue={
-              props.statuses.find((s) => s.id === props.task.statusId)?.name ??
-              0
-            }
-            disabled={isBeingDeleted}
-            onChange={handleOnChange}
-            className="w-full rounded border border-transparent border-b-slate-500 bg-transparent px-1 text-base capitalize"
-          >
-            {props.statuses.map((status) => {
-              return <option key={status.id.toString()}>{status.name}</option>;
-            })}
-          </select>
-        </label>
+
         <label className="my-10 grow text-xs">
           Description:
           <textarea
