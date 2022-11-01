@@ -11,8 +11,13 @@ type TaskForm = HTMLFormElement & {
 export const TaskForm = (props: {
   task: Task;
   statuses: Status[];
+  onExpanded: (val: boolean) => void
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const setIsExpandedWithCallback = (val: boolean) => {
+    setIsExpanded(val);
+    props.onExpanded(val);
+  }
   const [isBeingDeleted, setIsBeingDeleted] = useState(false);
   const [openDateIndex, setOpenDateIndex] = useState(0);
 
@@ -96,7 +101,7 @@ export const TaskForm = (props: {
           : "absolute z-0"
       }`}
       onClick={(e) => {
-        if (e.target === e.currentTarget) setIsExpanded(false);
+        if (e.target === e.currentTarget) setIsExpandedWithCallback(false);
       }}
     >
       <form
@@ -177,7 +182,7 @@ export const TaskForm = (props: {
                 type="button"
                 disabled={isBeingDeleted}
                 onClick={() => {
-                  setIsExpanded(false);
+                  setIsExpandedWithCallback(false);
                 }}
                 className="h-4 w-4 place-self-end self-start rounded font-mono text-xs text-rose-300 opacity-0 transition duration-300 ease-linear hover:cursor-pointer group-hover:opacity-100"
                 value="x"
@@ -231,7 +236,7 @@ export const TaskForm = (props: {
               disabled={isBeingDeleted}
               onClick={(e) => {
                 console.log(e);
-                setIsExpanded(true);
+                setIsExpandedWithCallback(true);
               }}
               value="Edit"
             />
