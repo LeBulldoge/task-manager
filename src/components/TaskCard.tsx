@@ -3,9 +3,9 @@ import { useState } from "react";
 import { TaskForm } from "./TaskForm";
 
 export const TaskCard = (props: { task: Task; statuses: Status[] }) => {
-  const [enableHover, setDisableHover] = useState(true);
+  const [enableHover, setEnableHover] = useState(true);
   const handleFormExpanded = (isExpanded: boolean) => {
-    setDisableHover(!isExpanded);
+    setEnableHover(!isExpanded);
   };
 
   return (
