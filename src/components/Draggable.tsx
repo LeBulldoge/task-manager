@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { DragEvent, MouseEvent, useRef, useState } from "react";
 import type { DragEventHandler } from "react";
 
 export const Draggable = (props: {
@@ -6,11 +6,24 @@ export const Draggable = (props: {
   children?: React.ReactNode;
   setDragged: (element: HTMLElement | null) => void;
 }) => {
+  const [disabled, setDisabled] = useState(false);
+
+  const ignoredNodes = ["input", "select", "textarea"];
+  const handleDisableDrag = (e: MouseEvent) => {
+    const target = e.target as HTMLElement;
+    const result = ignoredNodes.includes(target.nodeName.toLowerCase());
+    if (disabled != result) {
+      setDisabled(result);
+    }
+  };
+
   return (
     <div
       id={props.id}
-      onDragStart={(e) => {
-        if (props.disable) {
+      onClick={handleDisableDrag}
+      onMouseDown={handleDisableDrag}
+      onDragStart={(e: DragEvent<HTMLElement>) => {
+        if (disabled) {
           e.preventDefault();
           return;
         }
@@ -20,7 +33,7 @@ export const Draggable = (props: {
         e.preventDefault();
         props.setDragged(null);
       }}
-      draggable={!props.disable}
+      draggable={!disabled}
       className="hover:cursor-move"
     >
       {props.children}
