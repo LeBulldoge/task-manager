@@ -9,6 +9,7 @@ const taskUpdateSchema: z.ZodType<Prisma.TaskUpdateArgs> = z.object({
   data: z.object({
     name: z.string().optional(),
     statusId: z.number().optional(),
+    description: z.string().optional(),
     createdAt: z.date().optional(),
     updatedAt: z.date().optional(),
   }),
@@ -18,6 +19,7 @@ const taskCreateSchema: z.ZodType<Prisma.TaskCreateArgs> = z.object({
   data: z.object({
     name: z.string(),
     statusId: z.number(),
+    description: z.string().optional(),
     createdAt: z.date().optional(),
     updatedAt: z.date().optional(),
   }),

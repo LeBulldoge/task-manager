@@ -7,7 +7,7 @@ import Head from "next/head";
 import { trpc } from "@/utils/trpc";
 
 import { Dropzone, Draggable } from "@/components/Draggable";
-import { TaskForm } from "@/components/TaskForm";
+import { TaskCard } from "@/components/TaskCard";
 import { AddButton } from "@/components/AddButton";
 import { Dashboard } from "@/components/Dashboard";
 
@@ -60,7 +60,7 @@ const Home: NextPage = () => {
         </div>
         <table className="mb-auto w-auto table-fixed overflow-x-scroll bg-slate-500 md:w-full">
           <thead className="sticky top-0 bg-slate-600 uppercase drop-shadow">
-            <tr className="table-row">
+            <tr className="h-12">
               {statusQuery.data?.map((status) => {
                 return (
                   <th key={status.id.toString()} className="w-1/12 py-3 px-6">
@@ -77,7 +77,7 @@ const Home: NextPage = () => {
                   <td
                     key={status.id.toString()}
                     id={status.id.toString()}
-                    className="align-top"
+                    className="align-top border-x-2 border-slate-600 border-collapse"
                   >
                     <Dropzone
                       className="flex flex-wrap items-center justify-center gap-2 px-2 py-4"
@@ -102,7 +102,7 @@ const Home: NextPage = () => {
                             disable={isEditing}
                             setDragged={setCurrentlyDragged}
                           >
-                            <TaskForm
+                            <TaskCard
                               task={task}
                               statuses={statusQuery.data}
                               onEdit={setIsEditing}
@@ -112,7 +112,7 @@ const Home: NextPage = () => {
                       })}
                       <AddButton
                         disabled={isAddingCell}
-                        onClick={async () => handleAddTask(status.id)}
+                        onClick={() => handleAddTask(status.id)}
                       />
                     </Dropzone>
                   </td>

@@ -18,9 +18,10 @@ model Status {
 model Task {
   id Int @id @default(autoincrement())
 
-  name     String
-  status   Status @relation(fields: [statusId], references: [id])
-  statusId Int
+  name        String
+  status      Status @relation(fields: [statusId], references: [id])
+  statusId    Int
+  description String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

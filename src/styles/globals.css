@@ -6,6 +6,6 @@ body {
   @apply bg-slate-800 text-white;
 }
 
-input[type=text] {
+input[type=text], textarea {
   @apply focus:outline-none;
 }
