@@ -233,7 +233,7 @@ export const TaskForm = (props: {
           ) : (
             <button
               type="button"
-              className="mt-2 place-self-center self-end rounded-xl bg-primary py-2 px-2 text-primary-text enabled:hover:cursor-pointer disabled:text-secondary"
+              className="mt-2 place-self-center self-end rounded-xl bg-primary p-1.5 text-primary-text enabled:hover:cursor-pointer disabled:text-secondary"
               disabled={isBeingDeleted}
               onClick={(e) => {
                 console.log(e);
