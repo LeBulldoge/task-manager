@@ -10,7 +10,7 @@ export const AddButton = (props: {
       value="+"
       disabled={props.disabled}
       onClick={props.onClick}
-      className="h-36 w-36 rounded-xl border-2 border-dashed border-primary-text text-center font-mono text-7xl text-primary-text hover:cursor-pointer hover:bg-primary disabled:animate-pulse"
+      className="h-36 w-36 rounded-xl border border-outline text-center font-mono text-7xl text-secondary transition-all ease-linear hover:drop-shadow-lg hover:border-none hover:text-primary-text hover:cursor-pointer hover:bg-primary disabled:animate-pulse"
     />
   );
 };
