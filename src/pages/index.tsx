@@ -57,8 +57,8 @@ const Home: NextPage = () => {
         <div>
           <Dashboard />
         </div>
-        <table className="mb-auto w-auto table-fixed overflow-x-scroll bg-slate-500 md:w-full">
-          <thead className="sticky z-10 top-0 bg-slate-600 uppercase drop-shadow">
+        <table className="mb-auto w-auto table-fixed overflow-x-scroll md:w-full">
+          <thead className="sticky z-10 top-0 bg-layer-1 uppercase drop-shadow">
             <tr className="h-12">
               {statusQuery.data?.map((status) => {
                 return (
@@ -76,7 +76,7 @@ const Home: NextPage = () => {
                   <td
                     key={status.id.toString()}
                     id={status.id.toString()}
-                    className="border-collapse border-x-2 border-slate-600 align-top"
+                    className="border-collapse border-x-2 border-primary/5 align-top"
                   >
                     <Dropzone
                       className="flex flex-wrap items-center justify-center gap-2 px-2 py-4"
@@ -120,7 +120,7 @@ const Home: NextPage = () => {
         </table>
         <a
           href="https://github.com/LeBulldoge/task-manager"
-          className="group fixed bottom-0 right-0 flex gap-1 place-self-end pr-3 pb-1 text-xs text-slate-300 hover:underline"
+          className="group fixed bottom-0 right-0 flex gap-1 place-self-end pr-3 pb-1 text-xs hover:underline"
         >
           <Image
             src="/GitHub-Mark-Light-32px.png"

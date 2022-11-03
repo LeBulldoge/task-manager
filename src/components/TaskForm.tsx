@@ -1,6 +1,7 @@
 import { trpc } from "@/utils/trpc";
 import { Status, Task } from "@prisma/client";
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import { MdEdit } from "react-icons/md";
 
 type TaskForm = HTMLFormElement & {
   name: HTMLInputElement;
@@ -11,13 +12,13 @@ type TaskForm = HTMLFormElement & {
 export const TaskForm = (props: {
   task: Task;
   statuses: Status[];
-  onExpanded: (val: boolean) => void
+  onExpanded: (val: boolean) => void;
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const setIsExpandedWithCallback = (val: boolean) => {
     setIsExpanded(val);
     props.onExpanded(val);
-  }
+  };
   const [isBeingDeleted, setIsBeingDeleted] = useState(false);
   const [openDateIndex, setOpenDateIndex] = useState(0);
 
@@ -93,9 +94,9 @@ export const TaskForm = (props: {
     <div
       className={`top-0 left-0 right-0 bottom-0 transition-colors duration-200 ease-linear ${
         isExpanded
-          ? `fixed z-50 bg-transparent p-8 backdrop-blur-0 hover:cursor-auto md:p-16 ${
+          ? `fixed z-50 p-8 backdrop-blur-0 hover:cursor-auto md:p-16 ${
               isTransitioning
-                ? "bg-slate-700/50 backdrop-blur-sm"
+                ? "bg-surface/50 backdrop-blur-sm"
                 : "backdrop-blur-0"
             }`
           : "absolute z-0"
@@ -104,118 +105,118 @@ export const TaskForm = (props: {
         if (e.target === e.currentTarget) setIsExpandedWithCallback(false);
       }}
     >
-      <form
-        data-expanded={isExpanded}
-        className="group flex h-full w-full flex-col overflow-scroll rounded-xl bg-slate-600 p-2 shadow-xl transition duration-200 ease-out data-[expanded=true]:p-4"
-        onSubmit={handleOnSubmit}
-      >
-        <div className="grid grid-flow-col grid-cols-6 grid-rows-3 gap-3 overflow-hidden group-data-[expanded=false]:grid-cols-1 group-data-[expanded=false]:grid-rows-2 group-data-[expanded=true]:gap-5 md:grid-cols-5 md:grid-rows-2">
-          <label className="col-span-5 text-xs md:col-span-3">
-            Title:
-            <input
-              name="name"
-              autoFocus
-              type="text"
-              defaultValue={props.task.name}
-              required={true}
-              disabled={isBeingDeleted}
-              onChange={handleOnChange}
-              className="w-full rounded border border-transparent border-b-slate-500 bg-transparent px-2 text-base focus:border-b-slate-400 data-[edited=true]:border-orange-300/50"
-            />
-          </label>
-          <label className="col-span-5 text-xs md:col-span-3">
-            Status:
-            <select
-              name="statusId"
-              defaultValue={
-                props.statuses.find((s) => s.id === props.task.statusId)
-                  ?.name ?? 0
-              }
-              disabled={isBeingDeleted}
-              onChange={handleOnChange}
-              className="w-full rounded border border-transparent border-b-slate-500 bg-transparent px-1 text-base capitalize data-[edited=true]:border-orange-300/50"
-            >
-              {props.statuses.map((status) => {
-                return (
-                  <option key={status.id.toString()}>{status.name}</option>
-                );
-              })}
-            </select>
-          </label>
-          {isExpanded && (
-            <>
-              <details
-                className="col-span-3 md:col-span-1"
-                open={openDateIndex === 0}
-              >
-                <summary
-                  className="text-xs leading-6 hover:cursor-pointer"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setOpenDateIndex(0);
-                  }}
-                >
-                  Created at:
-                </summary>
-                <div className="px-2 text-sm">
-                  {props.task.createdAt.toLocaleString()}
-                </div>
-              </details>
-              <details
-                className="col-span-3 md:col-span-1"
-                open={openDateIndex === 1}
-              >
-                <summary
-                  className="text-xs leading-6 hover:cursor-pointer"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setOpenDateIndex(1);
-                  }}
-                >
-                  Updated at:
-                </summary>
-                <div className="px-2 text-sm">
-                  {props.task.updatedAt.toLocaleString()}
-                </div>
-              </details>
+      <div className="h-full w-full rounded-xl bg-surface">
+        <form
+          data-expanded={isExpanded}
+          className="group flex h-full w-full flex-col overflow-scroll rounded-xl bg-primary/10 p-2 shadow-xl transition duration-200 ease-out data-[expanded=true]:p-4"
+          onSubmit={handleOnSubmit}
+        >
+          <div className="grid grid-flow-col grid-cols-6 grid-rows-3 gap-3 overflow-hidden group-data-[expanded=false]:grid-cols-1 group-data-[expanded=false]:grid-rows-2 group-data-[expanded=true]:gap-5 md:grid-cols-5 md:grid-rows-2">
+            <label className="col-span-5 text-xs md:col-span-3">
+              Title:
               <input
-                type="button"
+                name="name"
+                autoFocus
+                type="text"
+                defaultValue={props.task.name}
+                required={true}
                 disabled={isBeingDeleted}
-                onClick={() => {
-                  setIsExpandedWithCallback(false);
-                }}
-                className="h-4 w-4 place-self-end self-start rounded font-mono text-xs text-rose-300 opacity-0 transition duration-300 ease-linear hover:cursor-pointer group-hover:opacity-100"
-                value="x"
+                onChange={handleOnChange}
+                className="w-full rounded border border-transparent border-b-outline bg-transparent px-2 text-base focus:border-b-primary data-[edited=true]:border-tetriary"
               />
-            </>
-          )}
-        </div>
+            </label>
+            <label className="col-span-5 text-xs md:col-span-3">
+              Status:
+              <select
+                name="statusId"
+                defaultValue={
+                  props.statuses.find((s) => s.id === props.task.statusId)
+                    ?.name ?? 0
+                }
+                disabled={isBeingDeleted}
+                onChange={handleOnChange}
+                className="w-full rounded border border-transparent border-b-outline bg-transparent px-1 text-base capitalize data-[edited=true]:border-tetriary"
+              >
+                {props.statuses.map((status) => {
+                  return (
+                    <option key={status.id.toString()}>{status.name}</option>
+                  );
+                })}
+              </select>
+            </label>
+            {isExpanded && (
+              <>
+                <details
+                  className="col-span-3 md:col-span-1"
+                  open={openDateIndex === 0}
+                >
+                  <summary
+                    className="text-xs leading-6 hover:cursor-pointer"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setOpenDateIndex(0);
+                    }}
+                  >
+                    Created at:
+                  </summary>
+                  <div className="px-2 text-sm">
+                    {props.task.createdAt.toLocaleString()}
+                  </div>
+                </details>
+                <details
+                  className="col-span-3 md:col-span-1"
+                  open={openDateIndex === 1}
+                >
+                  <summary
+                    className="text-xs leading-6 hover:cursor-pointer"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setOpenDateIndex(1);
+                    }}
+                  >
+                    Updated at:
+                  </summary>
+                  <div className="px-2 text-sm">
+                    {props.task.updatedAt.toLocaleString()}
+                  </div>
+                </details>
+                <input
+                  type="button"
+                  disabled={isBeingDeleted}
+                  onClick={() => {
+                    setIsExpandedWithCallback(false);
+                  }}
+                  className="h-4 w-4 place-self-end self-start rounded font-mono text-xs text-error opacity-0 transition duration-300 ease-linear hover:cursor-pointer group-hover:opacity-100"
+                  value="x"
+                />
+              </>
+            )}
+          </div>
 
-        {isExpanded && (
-          <label className="my-10 grow text-xs">
-            Description:
-            <textarea
-              name="description"
-              defaultValue={props.task.description ?? ""}
-              disabled={isBeingDeleted}
-              onChange={handleOnChange}
-              className="mt-2 h-full w-full rounded border border-slate-500 bg-transparent p-2 text-base data-[edited=true]:border-orange-300/50"
-            />
-          </label>
-        )}
-        <div className="flex w-full justify-between">
-          <input
-            type="reset"
-            value="Reset"
-            className="rounded border-slate-400 p-1 text-rose-200 focus:border enabled:hover:cursor-pointer enabled:hover:bg-slate-500 disabled:text-slate-300"
-            disabled={isBeingDeleted}
-          />
+          {isExpanded && (
+            <label className="my-10 grow text-xs">
+              Description:
+              <textarea
+                name="description"
+                defaultValue={props.task.description ?? ""}
+                disabled={isBeingDeleted}
+                onChange={handleOnChange}
+                className="mt-2 h-full w-full rounded border border-outline bg-transparent p-2 text-base focus:border-primary data-[edited=true]:border-tetriary"
+              />
+            </label>
+          )}
           {isExpanded ? (
-            <>
+            <div className="flex w-full justify-between">
+              <input
+                type="reset"
+                value="Reset"
+                className="rounded-full border border-outline px-4 text-error-container-text hover:border-transparent enabled:hover:cursor-pointer enabled:hover:bg-error-container disabled:text-secondary"
+                disabled={isBeingDeleted}
+              />
               <input
                 type="button"
                 value="Delete"
-                className="rounded border-slate-400 p-1 text-rose-200 focus:border enabled:hover:cursor-pointer enabled:hover:bg-slate-500 disabled:text-slate-300"
+                className="rounded-full border border-outline px-4 py-2 text-error-container-text hover:border-transparent enabled:hover:cursor-pointer enabled:hover:bg-error-container disabled:text-secondary"
                 disabled={isBeingDeleted}
                 onClick={() => {
                   setIsBeingDeleted(true);
@@ -224,25 +225,26 @@ export const TaskForm = (props: {
               />
               <input
                 type="submit"
-                className="rounded border-slate-400 p-1 text-blue-200 focus:border enabled:hover:cursor-pointer enabled:hover:bg-slate-500 disabled:text-slate-300"
+                className="rounded-full bg-primary px-4 py-2 text-primary-text focus:border enabled:hover:cursor-pointer enabled:hover:bg-primary-container-text disabled:text-secondary"
                 disabled={isBeingDeleted}
                 value="Submit"
               />
-            </>
+            </div>
           ) : (
-            <input
+            <button
               type="button"
-              className="rounded border-slate-400 p-1 text-blue-200 focus:border enabled:hover:cursor-pointer enabled:hover:bg-slate-500 disabled:text-slate-300"
+              className="mt-2 place-self-center self-end rounded-xl bg-primary py-2 px-2 text-primary-text enabled:hover:cursor-pointer disabled:text-secondary"
               disabled={isBeingDeleted}
               onClick={(e) => {
                 console.log(e);
                 setIsExpandedWithCallback(true);
               }}
-              value="Edit"
-            />
+            >
+              <MdEdit />
+            </button>
           )}
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
 };

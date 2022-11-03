@@ -60,14 +60,14 @@ export const Dashboard = () => {
   };
 
   return (
-    <div className="sticky top-0 left-0 bottom-0 z-50 flex min-h-screen basis-10 flex-col items-center gap-2 bg-slate-600 py-3 px-2 shadow">
+    <div className="sticky top-0 left-0 bottom-0 z-50 flex min-h-screen basis-10 flex-col items-center gap-2 bg-layer-1 py-3 px-2 shadow">
       <DashGroup title="Status List" icon={MdHistory}>
         <ul className="list-inside">
           {statusQuery.data?.map((status) => {
             return (
               <li
                 key={status.id.toString()}
-                className="group/item mb-4 flex w-full gap-2 rounded border border-slate-500 border-l-blue-300 p-2 transition-all hover:-translate-x-1 hover:border-l-blue-200"
+                className="group/item mb-4 flex w-full gap-2 rounded-xl bg-surface-text/5 border-b border-outline p-2 transition-all hover:-translate-x-1 hover:border-b-primary"
               >
                 <form
                   className="flex w-full gap-2"
@@ -96,13 +96,13 @@ export const Dashboard = () => {
                     name="statusName"
                     type="text"
                     defaultValue={status.name}
-                    className="w-full flex-grow rounded border border-transparent bg-inherit transition-colors ease-linear invalid:border-rose-400"
+                    className="w-full flex-grow rounded border border-transparent bg-inherit transition-colors ease-linear invalid:border-error"
                     onChange={statusNameValidation}
                   />
                   <input
                     type="button"
                     value="x"
-                    className="font-mono text-rose-200 opacity-0 transition-all ease-linear hover:cursor-pointer group-hover/item:opacity-100"
+                    className="font-mono text-error opacity-0 transition-all ease-linear hover:cursor-pointer group-hover/item:opacity-100"
                     onClick={() => {
                       deleteStatus.mutateAsync({ where: { id: status.id } });
                     }}
@@ -111,10 +111,10 @@ export const Dashboard = () => {
               </li>
             );
           })}
-          <div className="mb-4 border-b border-slate-500" />
+          <div className="mb-4 border-b border-outline" />
           <li
             key="NEW"
-            className="mb-4 flex rounded border border-slate-500 border-l-blue-300 p-2 text-blue-300 "
+            className="mb-4 flex rounded-xl bg-surface-text/5 border-b border-outline hover:border-b-tetriary p-2"
           >
             <form
               onSubmit={(e) => {
@@ -137,7 +137,7 @@ export const Dashboard = () => {
                   name="statusName"
                   type="text"
                   placeholder="Add a new status..."
-                  className="rounded border border-transparent bg-inherit text-white transition-colors ease-linear invalid:border-rose-400"
+                  className="rounded border border-transparent bg-inherit placeholder:text-tetriary transition-colors ease-linear invalid:border-error"
                   onChange={statusNameValidation}
                 />
               </label>
@@ -156,10 +156,10 @@ export const DashButton = (props: {
 }) => {
   return (
     <button
-      className="group/button z-10 flex h-8 w-8 items-center justify-center rounded-2xl border border-slate-500 bg-blue-400 text-center transition-all ease-linear group-hover:rounded-lg group-hover:bg-blue-300"
+      className="group/button z-10 flex h-8 w-8 items-center justify-center rounded-2xl bg-primary text-center text-primary-text transition-all ease-linear group-hover:rounded-lg group-hover:bg-primary-container-text"
       onClick={props.onClick}
     >
-      <div className="fixed w-auto translate-x-20 overflow-clip rounded border border-slate-500 bg-slate-700 p-1 opacity-0 transition group-hover/button:opacity-75 group-hover/button:delay-300">
+      <div className="fixed w-auto translate-x-20 overflow-clip bg-surface-inverse text-surface-inverse-text p-2 rounded-xl opacity-0 transition group-hover/button:opacity-75 group-hover/button:delay-300">
         {props.tooltip}
       </div>
       {props.children}
@@ -173,7 +173,7 @@ export const DashGroup = (props: {
   children: React.ReactNode;
 }) => {
   const drawer = useRef<HTMLDivElement>(null);
-  const classNamesShow = ["translate-x-12", "px-2"];
+  const classNamesShow = ["translate-x-12"]
   const classNamesHide = ["-translate-x-full", "opacity-0"];
 
   const [timeoutHandle, setTimeoutHandle] = useState<NodeJS.Timeout>();
@@ -185,16 +185,6 @@ export const DashGroup = (props: {
         if (timeoutHandle) {
           clearTimeout(timeoutHandle);
           setTimeoutHandle(undefined);
-        }
-      }}
-      onMouseLeave={(e) => {
-        if (!drawer.current?.hidden && !timeoutHandle) {
-          const button = e.currentTarget.firstElementChild as HTMLButtonElement;
-          setTimeoutHandle(
-            setTimeout(() => {
-              button.click();
-            }, 300)
-          );
         }
       }}
     >
@@ -216,18 +206,20 @@ export const DashGroup = (props: {
       >
         <props.icon
           size={24}
-          className="text-blue-100 transition ease-linear group-hover/button:scale-110"
+          className="text-primary-text transition ease-linear group-hover/button:scale-110"
         />
       </DashButton>
       <div
         ref={drawer}
         hidden={true}
-        className="fixed top-0 left-0 bottom-0 right-12 flex -translate-x-full flex-col border-x border-slate-500 bg-slate-600 py-3 opacity-0 shadow transition-all duration-300 ease-in md:right-auto md:w-64"
+        className="fixed top-0 left-0 bottom-0 right-12 -translate-x-full bg-surface opacity-0 shadow transition-all duration-300 ease-in md:right-auto md:w-64"
       >
-        <strong className="mb-5 w-full border-b border-slate-400 text-center text-2xl hover:cursor-default">
-          {props.title}
-        </strong>
-        {props.children}
+        <div className="flex flex-col bg-layer-1 w-full h-full py-3 px-2">
+          <strong className="mb-5 w-full border-b border-outline text-center text-2xl hover:cursor-default">
+            {props.title}
+          </strong>
+          {props.children}
+        </div>
       </div>
     </div>
   );

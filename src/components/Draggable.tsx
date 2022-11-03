@@ -66,9 +66,9 @@ export const Dropzone = (props: {
           props.onDrop?.(e);
         }
       }}
-      className={`${props.className} transition-all duration-200 ease-out ${
+      className={`${props.className} transition-all m-2 duration-200 ease-linear ${
         props.dragged && !self?.current?.contains(props.dragged)
-          ? " border-collapse rounded-bl-lg border border-l-4 border-slate-600 bg-slate-400"
+          ? " border-collapse rounded-lg bg-layer-1"
           : " border-transparent"
       }`}
     >
