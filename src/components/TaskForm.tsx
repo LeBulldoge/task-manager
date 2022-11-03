@@ -235,8 +235,7 @@ export const TaskForm = (props: {
               type="button"
               className="mt-2 place-self-center self-end rounded-xl bg-primary p-1.5 text-primary-text transition-all ease-linear hover:rounded-lg hover:bg-primary-container-text enabled:hover:cursor-pointer disabled:text-secondary"
               disabled={isBeingDeleted}
-              onClick={(e) => {
-                console.log(e);
+              onClick={() => {
                 setIsExpandedWithCallback(true);
               }}
             >
