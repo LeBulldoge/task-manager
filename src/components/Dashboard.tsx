@@ -1,8 +1,8 @@
 import { trpc } from "@/utils/trpc";
 import { Status } from "@prisma/client";
-import { ChangeEvent, useRef } from "react";
+import { ChangeEvent, MouseEvent, useRef } from "react";
 import { IconType } from "react-icons";
-import { MdHistory } from "react-icons/md";
+import { MdArrowDropDown, MdArrowDropUp, MdHistory } from "react-icons/md";
 
 export const Dashboard = () => {
   const utils = trpc.useContext();
@@ -32,10 +32,10 @@ export const Dashboard = () => {
   };
 
   const handleSwapOrder = async (
-    e: ChangeEvent<HTMLInputElement>,
+    direction: "up" | "down",
     status: Status
   ) => {
-    let value = -e.currentTarget.value;
+    let value = status.order + (direction === "up" ? -1 : 1);
     const statusToSwap = statusQuery.data?.find((s) => {
       return s != status && s.order === value;
     });
@@ -67,7 +67,7 @@ export const Dashboard = () => {
             return (
               <li
                 key={status.id.toString()}
-                className="group/item mb-4 flex w-full gap-2 rounded-xl bg-surface-text/5 border-b border-outline p-2 transition-all hover:-translate-x-1 hover:border-b-primary"
+                className="group/item mb-4 flex w-full gap-2 rounded-xl border-b border-outline bg-surface-text/5 p-2 transition-all hover:-translate-x-1 hover:border-b-primary"
               >
                 <form
                   className="flex w-full gap-2"
@@ -84,14 +84,25 @@ export const Dashboard = () => {
                   }}
                   onBlur={(e) => e.currentTarget.reset()}
                 >
-                  <input
-                    name="statusOrder"
-                    type="number"
-                    defaultValue={-status.order}
-                    max={0}
-                    className="w-0 bg-inherit opacity-0 transition-all ease-linear hover:cursor-pointer group-hover/item:w-4 group-hover/item:opacity-100"
-                    onChange={(e) => handleSwapOrder(e, status)}
-                  />
+                  <div className="flex w-0 flex-col text-primary opacity-0 transition-all ease-linear hover:cursor-pointer group-hover/item:w-4 group-hover/item:opacity-100">
+                    <div
+                      className="transition hover:text-primary-container-text ease-linear hover:scale-150"
+                      hidden={status.order === 0}
+                      onClick={() => handleSwapOrder("up", status)}
+                    >
+                      <MdArrowDropUp size={18} />
+                    </div>
+                    <div
+                      className="transition hover:text-primary-container-text ease-linear hover:scale-150"
+                      hidden={
+                        status.order ===
+                        Math.max(...statusQuery.data.map((s) => s.order))
+                      }
+                      onClick={() => handleSwapOrder("down", status)}
+                    >
+                      <MdArrowDropDown size={18} />
+                    </div>
+                  </div>
                   <input
                     name="statusName"
                     type="text"
@@ -114,7 +125,7 @@ export const Dashboard = () => {
           <div className="mb-4 border-b border-outline" />
           <li
             key="NEW"
-            className="mb-4 flex rounded-xl bg-surface-text/5 border-b border-outline hover:border-b-tetriary p-2"
+            className="mb-4 flex rounded-xl border-b border-outline bg-surface-text/5 p-2 hover:border-b-tetriary"
           >
             <form
               onSubmit={(e) => {
@@ -137,7 +148,7 @@ export const Dashboard = () => {
                   name="statusName"
                   type="text"
                   placeholder="Add a new status..."
-                  className="rounded border border-transparent bg-inherit placeholder:text-tetriary transition-colors ease-linear invalid:border-error"
+                  className="rounded border border-transparent bg-inherit transition-colors ease-linear placeholder:text-tetriary invalid:border-error"
                   onChange={statusNameValidation}
                 />
               </label>
@@ -162,7 +173,7 @@ export const DashButton = (props: {
         e.currentTarget.classList.toggle("rounded-lg");
       }}
     >
-      <div className="fixed w-auto translate-x-20 overflow-clip bg-surface-inverse text-surface-inverse-text p-2 rounded-xl opacity-0 transition group-hover/button:opacity-75 group-hover/button:delay-300">
+      <div className="fixed w-auto translate-x-20 overflow-clip rounded-xl bg-surface-inverse p-2 text-surface-inverse-text opacity-0 transition group-hover/button:opacity-75 group-hover/button:delay-300">
         {props.tooltip}
       </div>
       {props.children}
@@ -176,13 +187,11 @@ export const DashGroup = (props: {
   children: React.ReactNode;
 }) => {
   const drawer = useRef<HTMLDivElement>(null);
-  const classNamesShow = ["translate-x-12"]
+  const classNamesShow = ["translate-x-12"];
   const classNamesHide = ["-translate-x-full", "opacity-0"];
 
   return (
-    <div
-      className="group w-full"
-    >
+    <div className="group w-full">
       <DashButton
         tooltip={props.title}
         onClick={() => {
@@ -207,9 +216,9 @@ export const DashGroup = (props: {
       <div
         ref={drawer}
         hidden={true}
-        className="fixed top-0 left-0 bottom-0 right-12 -translate-x-full bg-surface opacity-0 shadow transition-all duration-300 ease-in md:right-auto md:w-64"
+        className="fixed top-0 left-0 bottom-0 right-0 -translate-x-full bg-surface opacity-0 shadow transition-all duration-300 ease-in md:right-auto"
       >
-        <div className="flex flex-col bg-layer-1 w-full h-full py-3 px-2">
+        <div className="flex h-full w-full flex-col bg-layer-1 py-3 px-2 md:w-64">
           <strong className="mb-5 w-full border-b border-outline text-center text-2xl hover:cursor-default">
             {props.title}
           </strong>
