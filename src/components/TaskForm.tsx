@@ -108,7 +108,7 @@ export const TaskForm = (props: {
       <div className="h-full w-full rounded-xl bg-surface">
         <form
           data-expanded={isExpanded}
-          className="group flex h-full w-full flex-col overflow-scroll rounded-xl bg-primary/10 p-2 shadow-xl transition duration-200 ease-out data-[expanded=true]:p-4"
+          className="group flex h-full w-full flex-col rounded-xl bg-layer-1 p-2 shadow-xl transition duration-200 ease-out data-[expanded=true]:overflow-scroll data-[expanded=true]:p-4"
           onSubmit={handleOnSubmit}
         >
           <div className="grid grid-flow-col grid-cols-6 grid-rows-3 gap-3 overflow-hidden group-data-[expanded=false]:grid-cols-1 group-data-[expanded=false]:grid-rows-2 group-data-[expanded=true]:gap-5 md:grid-cols-5 md:grid-rows-2">
@@ -233,7 +233,7 @@ export const TaskForm = (props: {
           ) : (
             <button
               type="button"
-              className="mt-2 place-self-center self-end rounded-xl bg-primary p-1.5 text-primary-text enabled:hover:cursor-pointer disabled:text-secondary"
+              className="mt-2 place-self-center self-end rounded-xl bg-primary p-1.5 text-primary-text transition-all ease-linear hover:rounded-lg hover:bg-primary-container-text enabled:hover:cursor-pointer disabled:text-secondary"
               disabled={isBeingDeleted}
               onClick={(e) => {
                 console.log(e);

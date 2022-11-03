@@ -1,6 +1,6 @@
 import { trpc } from "@/utils/trpc";
 import { Status } from "@prisma/client";
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, useRef } from "react";
 import { IconType } from "react-icons";
 import { MdHistory } from "react-icons/md";
 
@@ -156,8 +156,11 @@ export const DashButton = (props: {
 }) => {
   return (
     <button
-      className="group/button z-10 flex h-8 w-8 items-center justify-center rounded-2xl bg-primary text-center text-primary-text transition-all ease-linear group-hover:rounded-lg group-hover:bg-primary-container-text"
-      onClick={props.onClick}
+      className="group/button z-10 flex h-8 w-8 items-center justify-center rounded-2xl bg-primary text-center text-primary-text transition-all ease-linear hover:rounded-lg hover:bg-primary-container-text"
+      onClick={(e) => {
+        props.onClick(e);
+        e.currentTarget.classList.toggle("rounded-lg");
+      }}
     >
       <div className="fixed w-auto translate-x-20 overflow-clip bg-surface-inverse text-surface-inverse-text p-2 rounded-xl opacity-0 transition group-hover/button:opacity-75 group-hover/button:delay-300">
         {props.tooltip}
@@ -176,17 +179,9 @@ export const DashGroup = (props: {
   const classNamesShow = ["translate-x-12"]
   const classNamesHide = ["-translate-x-full", "opacity-0"];
 
-  const [timeoutHandle, setTimeoutHandle] = useState<NodeJS.Timeout>();
-
   return (
     <div
       className="group w-full"
-      onMouseEnter={() => {
-        if (timeoutHandle) {
-          clearTimeout(timeoutHandle);
-          setTimeoutHandle(undefined);
-        }
-      }}
     >
       <DashButton
         tooltip={props.title}
@@ -206,7 +201,7 @@ export const DashGroup = (props: {
       >
         <props.icon
           size={24}
-          className="text-primary-text transition ease-linear group-hover/button:scale-110"
+          className="transition ease-linear group-hover/button:scale-110"
         />
       </DashButton>
       <div
