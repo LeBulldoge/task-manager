@@ -1,5 +1,5 @@
 import type { NextPage } from "next";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import Image from "next/future/image";
 import Head from "next/head";
@@ -46,6 +46,29 @@ const Home: NextPage = () => {
     setIsAddingCell(true);
   };
 
+  const [isIntersecting, setIsIntersecting] = useState(false);
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const res = entries.some(
+          (e) => !e.isIntersecting && e.boundingClientRect.y < 0
+        );
+        if (res != isIntersecting) setIsIntersecting(res);
+      },
+      { threshold: 1 }
+    );
+
+    const targets = document.querySelectorAll(".scroll-intersect");
+    targets.forEach((target) => {
+      observer.observe(target);
+    });
+
+    () =>
+      targets.forEach((target) => {
+        observer.unobserve(target);
+      });
+  });
+
   return (
     <>
       <Head>
@@ -57,9 +80,17 @@ const Home: NextPage = () => {
         <div>
           <Dashboard />
         </div>
-        <table className="mb-auto w-auto table-fixed overflow-x-scroll md:w-full">
-          <thead className="sticky z-10 top-0 bg-layer-1 uppercase drop-shadow">
-            <tr className="h-12">
+        <table className="mb-auto w-auto table-fixed overflow-x-scroll bg-surface md:w-full">
+          <thead
+            className={`sticky top-0 z-10 bg-surface uppercase transition-all ease-linear ${
+              isIntersecting ? "shadow" : ""
+            }`}
+          >
+            <tr
+              className={`h-12 transition-all ease-linear ${
+                isIntersecting ? "bg-layer-2" : ""
+              }`}
+            >
               {statusQuery.data?.map((status) => {
                 return (
                   <th key={status.id.toString()} className="w-1/12 py-3 px-6">
@@ -76,10 +107,10 @@ const Home: NextPage = () => {
                   <td
                     key={status.id.toString()}
                     id={status.id.toString()}
-                    className="border-collapse border-x-2 border-primary/5 align-top"
+                    className="align-top"
                   >
                     <Dropzone
-                      className="flex flex-wrap items-center justify-center gap-2 px-2 py-4"
+                      className="scroll-intersect flex flex-wrap items-center justify-center gap-2 px-2 py-4"
                       dragged={currentlyDragged}
                       onDrop={() => {
                         if (!currentlyDragged) return;
@@ -100,10 +131,7 @@ const Home: NextPage = () => {
                             key={task.id}
                             setDragged={setCurrentlyDragged}
                           >
-                            <TaskCard
-                              task={task}
-                              statuses={statusQuery.data}
-                            />
+                            <TaskCard task={task} statuses={statusQuery.data} />
                           </Draggable>
                         );
                       })}

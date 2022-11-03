@@ -60,7 +60,7 @@ export const Dashboard = () => {
   };
 
   return (
-    <div className="sticky top-0 left-0 bottom-0 z-50 flex min-h-screen basis-10 flex-col items-center gap-2 bg-layer-1 py-3 px-2 shadow">
+    <div className="sticky top-0 left-0 bottom-0 z-50 flex min-h-screen basis-10 flex-col items-center gap-2 bg-layer-2 py-3 px-2">
       <DashGroup title="Status List" icon={MdHistory}>
         <ul className="list-inside">
           {statusQuery.data?.map((status) => {
@@ -216,9 +216,9 @@ export const DashGroup = (props: {
       <div
         ref={drawer}
         hidden={true}
-        className="fixed top-0 left-0 bottom-0 right-0 -translate-x-full bg-surface opacity-0 shadow transition-all duration-300 ease-in md:right-auto"
+        className="fixed top-0 left-0 bottom-0 right-0 -translate-x-full bg-surface opacity-0 transition-all duration-300 ease-in md:right-auto"
       >
-        <div className="flex h-full w-full flex-col bg-layer-1 py-3 px-2 md:w-64">
+        <div className="flex h-full w-full flex-col bg-layer-2 py-3 px-2 md:w-64">
           <strong className="mb-5 w-full border-b border-outline text-center text-2xl hover:cursor-default">
             {props.title}
           </strong>
