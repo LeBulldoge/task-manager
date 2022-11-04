@@ -115,3 +115,5 @@ export const taskRouter = router({
       return res;
     }),
 });
+
+export type TaskRouter = typeof taskRouter;
