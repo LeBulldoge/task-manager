@@ -218,7 +218,7 @@ export const DashGroup = (props: {
         hidden={true}
         className="fixed top-0 left-0 bottom-0 right-0 -translate-x-full bg-surface opacity-0 transition-all duration-300 ease-in md:right-auto"
       >
-        <div className="flex h-full w-full flex-col bg-layer-2 py-3 px-2 md:w-64">
+        <div className="flex h-full flex-col bg-layer-2 py-3 px-2 md:w-64">
           <strong className="mb-5 w-full border-b border-outline text-center text-2xl hover:cursor-default">
             {props.title}
           </strong>

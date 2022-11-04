@@ -114,7 +114,7 @@ export const TaskBoard = ({ statusArray }: { statusArray: StatusResponse }) => {
                       <Draggable
                         id={task.id.toString()}
                         key={task.id}
-                        setDragged={setCurrentlyDragged}
+                        setDraggedElement={setCurrentlyDragged}
                       >
                         <TaskCard task={task} statuses={statusArray} />
                       </Draggable>
