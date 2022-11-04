@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 
 import { trpc } from "@/utils/trpc";
@@ -99,14 +98,19 @@ export const TaskBoard = ({ statusArray }: { statusArray: StatusResponse }) => {
                   dragged={currentlyDragged}
                   onDrop={() => {
                     if (!currentlyDragged) return;
-                    updateTask.mutate({
-                      where: {
-                        id: Number.parseInt(currentlyDragged.id),
-                      },
-                      data: {
-                        statusId: status.id,
-                      },
-                    });
+                    currentlyDragged.classList.add("animate-pulse");
+                    updateTask
+                      .mutateAsync({
+                        where: {
+                          id: Number.parseInt(currentlyDragged.id),
+                        },
+                        data: {
+                          statusId: status.id,
+                        },
+                      })
+                      .finally(() => {
+                        currentlyDragged.classList.remove("animate-pulse");
+                      });
                   }}
                 >
                   {status.tasks.map((task) => {
