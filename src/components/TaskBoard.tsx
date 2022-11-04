@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import { trpc } from "@/utils/trpc";
 import type { inferRouterOutputs } from "@trpc/server";
@@ -7,6 +7,7 @@ import type { TaskRouter } from "@/server/trpc/router/tasks";
 import { Dropzone, Draggable } from "@/components/Draggable";
 import { TaskCard } from "@/components/TaskCard";
 import { AddButton } from "@/components/AddButton";
+import { MessageContext } from "./Toast";
 
 type StatusResponse = inferRouterOutputs<TaskRouter>["getAllStatuses"];
 export const TaskBoard = ({ statusArray }: { statusArray: StatusResponse }) => {
@@ -17,6 +18,7 @@ export const TaskBoard = ({ statusArray }: { statusArray: StatusResponse }) => {
     },
   });
 
+  const ctx = useContext(MessageContext);
   const updateTask = trpc.tasks.updateTask.useMutation({
     async onSuccess() {
       await utils.tasks.invalidate();
@@ -31,6 +33,7 @@ export const TaskBoard = ({ statusArray }: { statusArray: StatusResponse }) => {
       .mutateAsync({ data: { name: "New task", statusId: status } })
       .then(() => {
         setIsAddingCell(false);
+        ctx?.addMessage({type: "info", title: "Success", text: "Task added!"});
       });
 
     setIsAddingCell(true);

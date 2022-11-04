@@ -1,12 +1,13 @@
 import { trpc } from "@/utils/trpc";
 import { Status, Task } from "@prisma/client";
-import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import { ChangeEvent, FormEvent, useContext, useEffect, useState } from "react";
 import { MdEdit } from "react-icons/md";
+import { MessageContext } from "./Toast";
 
 type TaskForm = HTMLFormElement & {
   name: HTMLInputElement;
   statusId: HTMLInputElement;
-  description: HTMLTextAreaElement;
+  description?: HTMLTextAreaElement;
 };
 
 export const TaskForm = (props: {
@@ -23,9 +24,11 @@ export const TaskForm = (props: {
   const [openDateIndex, setOpenDateIndex] = useState(0);
 
   const utils = trpc.useContext();
+  const messageCtx = useContext(MessageContext);
   const updateTask = trpc.tasks.updateTask.useMutation({
     async onSuccess() {
       utils.tasks.invalidate();
+      messageCtx?.addMessage({type: "info", title: "Success", text: "Task successfully updated!"})
     },
   });
 
@@ -33,10 +36,12 @@ export const TaskForm = (props: {
     async onSuccess() {
       utils.tasks.invalidate();
       setIsBeingDeleted(false);
+      messageCtx?.addMessage({type: "info", title: "Success", text: "Task successfully deleted!"})
     },
     async onError(error) {
       console.log(error);
       setIsBeingDeleted(false);
+      messageCtx?.addMessage({type: "info", title: "Error", text: "Could not delete task!"})
     },
   });
 
@@ -75,13 +80,15 @@ export const TaskForm = (props: {
         data: {
           name: form.name.value,
           statusId: statusId,
-          description: form.description.value,
+          description: form.description?.value,
         },
       })
       .then(() => {
         form.name.dataset["edited"] = "false";
         form.statusId.dataset["edited"] = "false";
-        form.description.dataset["edited"] = "false";
+        if (form.description) {
+          form.description.dataset["edited"] = "false";
+        }
       });
   };
 
