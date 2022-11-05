@@ -123,11 +123,12 @@ export const TaskForm = (props: TaskFormProps) => {
       }}
     >
       <div className="h-full w-full rounded-xl bg-surface">
-          <TabContainer
-            hidden={!props.expanded}
-            tabs={[props.task.name, "Relations"]}
-            onTabChange={setOpenTabIndex}
-          />
+        <TabContainer
+          hidden={!props.expanded}
+          tabs={[props.task.name, "Relations"]}
+          onTabChange={setOpenTabIndex}
+        />
+
         {(!props.expanded || openTabIndex === 0) && (
           <form
             data-expanded={props.expanded}
@@ -197,44 +198,43 @@ export const TaskForm = (props: TaskFormProps) => {
                 </>
               )}
             </div>
-
-            {props.expanded && (
-              <label className="my-10 grow text-xs">
-                Description:
-                <textarea
-                  name="description"
-                  defaultValue={props.task.description ?? ""}
-                  disabled={isBeingDeleted}
-                  onChange={handleOnChange}
-                  className="mt-2 h-full w-full rounded border border-outline bg-transparent p-2 text-base focus:border-primary data-[edited=true]:border-tetriary"
-                />
-              </label>
-            )}
             {props.expanded ? (
-              <div className="flex w-full justify-between">
-                <input
-                  type="reset"
-                  value="Reset"
-                  className="rounded-full border border-outline px-4 text-error-container-text hover:border-transparent enabled:hover:cursor-pointer enabled:hover:bg-error-container disabled:text-secondary"
-                  disabled={isBeingDeleted}
-                />
-                <input
-                  type="button"
-                  value="Delete"
-                  className="rounded-full border border-outline px-4 py-2 text-error-container-text hover:border-transparent enabled:hover:cursor-pointer enabled:hover:bg-error-container disabled:text-secondary"
-                  disabled={isBeingDeleted}
-                  onClick={() => {
-                    setIsBeingDeleted(true);
-                    deleteTask.mutate({ where: { id: props.task.id } });
-                  }}
-                />
-                <input
-                  type="submit"
-                  className="rounded-full bg-primary px-4 py-2 text-primary-text focus:border enabled:hover:cursor-pointer enabled:hover:bg-primary-container-text disabled:text-secondary"
-                  disabled={isBeingDeleted}
-                  value="Submit"
-                />
-              </div>
+              <>
+                <label className="my-10 grow text-xs">
+                  Description:
+                  <textarea
+                    name="description"
+                    defaultValue={props.task.description ?? ""}
+                    disabled={isBeingDeleted}
+                    onChange={handleOnChange}
+                    className="mt-2 h-full w-full rounded border border-outline bg-transparent p-2 text-base focus:border-primary data-[edited=true]:border-tetriary"
+                  />
+                </label>
+                <div className="flex w-full justify-between">
+                  <input
+                    type="reset"
+                    value="Reset"
+                    className="rounded-full border border-outline px-4 text-error-container-text hover:border-transparent enabled:hover:cursor-pointer enabled:hover:bg-error-container disabled:text-secondary"
+                    disabled={isBeingDeleted}
+                  />
+                  <input
+                    type="button"
+                    value="Delete"
+                    className="rounded-full border border-outline px-4 py-2 text-error-container-text hover:border-transparent enabled:hover:cursor-pointer enabled:hover:bg-error-container disabled:text-secondary"
+                    disabled={isBeingDeleted}
+                    onClick={() => {
+                      setIsBeingDeleted(true);
+                      deleteTask.mutate({ where: { id: props.task.id } });
+                    }}
+                  />
+                  <input
+                    type="submit"
+                    className="rounded-full bg-primary px-4 py-2 text-primary-text focus:border enabled:hover:cursor-pointer enabled:hover:bg-primary-container-text disabled:text-secondary"
+                    disabled={isBeingDeleted}
+                    value="Submit"
+                  />
+                </div>
+              </>
             ) : (
               <button
                 type="button"
@@ -249,12 +249,14 @@ export const TaskForm = (props: TaskFormProps) => {
             )}
           </form>
         )}
+
         {props.expanded && openTabIndex === 1 && (
-          <div className="flex h-full w-full justify-evenly gap-2 bg-layer-2 p-4">
+          <div className="flex h-full w-full justify-evenly gap-2 rounded-xl bg-layer-2 p-4">
             <div className="flex w-full flex-col items-center rounded-xl p-2">
-              <strong className="text-xl leading-6">
-                Parent tasks: {props.task.childOf.length}
-              </strong>
+              <div className="flex w-full px-1 text-xl leading-6">
+                <strong className="w-full">Parent tasks</strong>
+                <strong>{props.task.childOf.length}</strong>
+              </div>
               <div className="mt-2 mb-4 w-full rounded-full border-y border-outline/50" />
               <ul className="w-fit list-inside list-disc marker:text-primary hover:marker:text-primary-container-text">
                 {props.task.childOf.map((link) => {
@@ -270,11 +272,12 @@ export const TaskForm = (props: TaskFormProps) => {
                 })}
               </ul>
             </div>
-            <div className="rounded-xl border-x my-2 border-outline/50" />
+            <div className="my-2 rounded-xl border-x border-outline/50" />
             <div className="flex w-full flex-col items-center rounded-xl p-2">
-              <strong className="w-full text-xl leading-6">
-                Child tasks: <span className="text-right">{props.task.parentOf.length}</span>
-              </strong>
+              <div className="flex w-full px-1 text-xl leading-6">
+                <strong className="w-full">Child tasks</strong>
+                <strong>{props.task.parentOf.length}</strong>
+              </div>
               <div className="mt-2 mb-4 w-full rounded-full border-y border-outline/50" />
               <ul className="w-fit list-outside list-disc marker:text-primary hover:marker:text-primary-container-text">
                 {props.task.parentOf.map((link) => {
