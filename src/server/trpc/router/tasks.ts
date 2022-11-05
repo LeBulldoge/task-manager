@@ -59,10 +59,34 @@ export const taskRouter = router({
     return ctx.prisma.task.findMany();
   }),
 
+  getTask: publicProcedure
+    .input(z.object({ id: z.number() }))
+    .query(({ ctx, input }) => {
+      return ctx.prisma.task.findUnique({
+        where: {
+          ...input,
+        },
+        include: {
+          parentOf: true,
+          childOf: true,
+        },
+      });
+    }),
+
   createTask: publicProcedure
     .input(taskCreateSchema)
     .mutation(({ ctx, input }) => {
       return ctx.prisma.task.create(input);
+    }),
+
+  addLink: publicProcedure
+    .input(z.object({ parentId: z.number(), childId: z.number(), type: z.string() }))
+    .mutation(({ ctx, input }) => {
+      return ctx.prisma.link.create({
+        data: {
+          ...input,
+        }
+      })
     }),
 
   updateTask: publicProcedure
@@ -82,7 +106,32 @@ export const taskRouter = router({
     .query(({ ctx, input }) => {
       return ctx.prisma.status.findMany({
         include: {
-          tasks: input.includeTasks,
+          tasks: {
+            include: {
+              parentOf: {
+                select: {
+                  type: true,
+                  child: {
+                    select: {
+                      id: true,
+                      name: true,
+                    },
+                  },
+                },
+              },
+              childOf: {
+                select: {
+                  type: true,
+                  parent: {
+                    select: {
+                      id: true,
+                      name: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
         },
         orderBy: {
           order: "asc",

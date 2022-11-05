@@ -1,12 +1,29 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["referentialIntegrity"]
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider             = "mysql"
+  url                  = env("DATABASE_URL")
   referentialIntegrity = "prisma"
+}
+
+model LinkType {
+  name  String @id
+  links Link[]
+}
+
+model Link {
+  id Int @id @default(autoincrement())
+
+  type     String
+  linkType LinkType @relation(fields: [type], references: [name])
+
+  parentId Int
+  parent   Task @relation("Parents", fields: [parentId], references: [id])
+  childId  Int
+  child    Task @relation("Children", fields: [childId], references: [id])
 }
 
 model Status {
@@ -21,9 +38,12 @@ model Task {
   id Int @id @default(autoincrement())
 
   name        String
-  status      Status @relation(fields: [statusId], references: [id])
+  status      Status  @relation(fields: [statusId], references: [id])
   statusId    Int
   description String?
+
+  parentOf  Link[] @relation("Parents")
+  childOf   Link[] @relation("Children")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

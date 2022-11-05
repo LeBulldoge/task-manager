@@ -39,6 +39,8 @@ export const TaskBoard = ({ statusArray }: { statusArray: StatusResponse }) => {
     setIsAddingCell(true);
   };
 
+  const [expandedTaskId, setExpandedTaskId] = useState<number | null>(null)
+
   const [currentlyDragged, setCurrentlyDragged] = useState<HTMLElement | null>(
     null
   );
@@ -123,7 +125,7 @@ export const TaskBoard = ({ statusArray }: { statusArray: StatusResponse }) => {
                         key={task.id}
                         setDraggedElement={setCurrentlyDragged}
                       >
-                        <TaskCard task={task} statuses={statusArray} />
+                        <TaskCard expanded={expandedTaskId === task.id} setExpandedTaskId={setExpandedTaskId} task={task} statusArray={statusArray} />
                       </Draggable>
                     );
                   })}
