@@ -17,16 +17,18 @@ const Home: NextPage = () => {
 
   const [messageList, setMessageList] = useState<Message[]>([]);
   const addMessage = (message: Message) => {
+    const timeout = setTimeout(() => {
+      dismissMessage(message);
+    }, 2000);
+    message.timeout = timeout;
     setMessageList((list) => {
       const lastId = list[list.length - 1]?.id ?? 0;
       message.id = lastId + 1;
-      return [...list, message ];
+      return [...list, message];
     });
-    setTimeout(() => {
-      dismissMessage(message);
-    }, 2000);
   };
   const dismissMessage = (message: Message) => {
+    clearTimeout(message.timeout);
     setMessageList(list => list.filter(m => m.id !== message.id))
   }
 
@@ -56,7 +58,7 @@ const Home: NextPage = () => {
             />
             GitHub
           </a>
-          <Toast messageList={messageList} dismissHandler={dismissMessage} />
+          <Toast messageList={messageList} onDismiss={dismissMessage} />
         </MessageContext.Provider>
       </main>
     </>
