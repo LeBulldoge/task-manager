@@ -24,11 +24,11 @@ export const TaskForm = (props: TaskFormProps) => {
   const [openTabIndex, setOpenTabIndex] = useState(0);
 
   const taskCtx = useContext(TaskContext);
+  const messageCtx = useContext(MessageContext);
   const task = taskCtx?.tasks.find((t) => t.id === props.taskId);
   if (!task || !taskCtx) {
     return null;
   }
-  const messageCtx = useContext(MessageContext);
 
   const utils = trpc.useContext();
   const updateTask = trpc.tasks.updateTask.useMutation({
@@ -310,7 +310,6 @@ export const TaskForm = (props: TaskFormProps) => {
                           type="button"
                           value="x"
                           className="font-mono text-error opacity-0 transition-all ease-linear hover:cursor-pointer group-hover/item:opacity-100"
-                          onClick={() => {}}
                         />
                       </form>
                     </li>

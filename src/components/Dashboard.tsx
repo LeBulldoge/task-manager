@@ -6,7 +6,7 @@ import { MdArrowDropDown, MdArrowDropUp, MdHistory } from "react-icons/md";
 
 export const Dashboard = () => {
   const utils = trpc.useContext();
-  const statusQuery = trpc.tasks.getAllStatuses.useQuery({});
+  const statusQuery = trpc.tasks.getAllStatuses.useQuery();
 
   let shouldInvalidate = true;
   const invalidateCallback = {
