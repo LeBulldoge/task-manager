@@ -56,7 +56,32 @@ const statusDeleteSchema: z.ZodType<Prisma.StatusDeleteArgs> = z.object({
 
 export const taskRouter = router({
   getAllTasks: publicProcedure.query(({ ctx }) => {
-    return ctx.prisma.task.findMany();
+    return ctx.prisma.task.findMany({
+      include: {
+        parentOf: {
+          select: {
+            type: true,
+            child: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
+        childOf: {
+          select: {
+            type: true,
+            parent: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
+      },
+    });
   }),
 
   getTask: publicProcedure
@@ -80,13 +105,15 @@ export const taskRouter = router({
     }),
 
   addLink: publicProcedure
-    .input(z.object({ parentId: z.number(), childId: z.number(), type: z.string() }))
+    .input(
+      z.object({ parentId: z.number(), childId: z.number(), type: z.string() })
+    )
     .mutation(({ ctx, input }) => {
       return ctx.prisma.link.create({
         data: {
           ...input,
-        }
-      })
+        },
+      });
     }),
 
   updateTask: publicProcedure
@@ -102,41 +129,8 @@ export const taskRouter = router({
     }),
 
   getAllStatuses: publicProcedure
-    .input(z.object({ includeTasks: z.boolean().optional() }))
-    .query(({ ctx, input }) => {
-      return ctx.prisma.status.findMany({
-        include: {
-          tasks: {
-            include: {
-              parentOf: {
-                select: {
-                  type: true,
-                  child: {
-                    select: {
-                      id: true,
-                      name: true,
-                    },
-                  },
-                },
-              },
-              childOf: {
-                select: {
-                  type: true,
-                  parent: {
-                    select: {
-                      id: true,
-                      name: true,
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-        orderBy: {
-          order: "asc",
-        },
-      });
+    .query(({ ctx }) => {
+      return ctx.prisma.status.findMany();
     }),
 
   createStatus: publicProcedure

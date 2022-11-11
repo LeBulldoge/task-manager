@@ -1,10 +1,10 @@
-import { TaskRouter } from "@/server/trpc/router/tasks";
+import { fuzzySearch } from "@/utils/fuzzy";
 import { trpc } from "@/utils/trpc";
-import { Status } from "@prisma/client";
-import { inferRouterOutputs } from "@trpc/server";
 import { ChangeEvent, FormEvent, useContext, useState } from "react";
 import { MdEdit } from "react-icons/md";
-import TabContainer, { Tab } from "./TabContainer";
+import { CompletableInput } from "./CompletableInput";
+import TabContainer from "./TabContainer";
+import { TaskContext } from "./TaskBoard";
 import { MessageContext } from "./Toast";
 
 type TaskForm = HTMLFormElement & {
@@ -12,15 +12,9 @@ type TaskForm = HTMLFormElement & {
   statusId: HTMLInputElement;
   description?: HTMLTextAreaElement;
 };
-type ArrElement<ArrType> = ArrType extends readonly (infer ElementType)[]
-  ? ElementType
-  : never;
 
-type QueryResult = inferRouterOutputs<TaskRouter>["getAllStatuses"];
-type Task = ArrElement<ArrElement<QueryResult>["tasks"]>;
 export interface TaskFormProps {
-  task: Task;
-  statusArray: Status[];
+  taskId: number;
   expanded: boolean;
   setExpandedTaskId: (id: number | null) => void;
 }
@@ -29,8 +23,14 @@ export const TaskForm = (props: TaskFormProps) => {
   const [isBeingDeleted, setIsBeingDeleted] = useState(false);
   const [openTabIndex, setOpenTabIndex] = useState(0);
 
-  const utils = trpc.useContext();
+  const taskCtx = useContext(TaskContext);
+  const task = taskCtx?.tasks.find((t) => t.id === props.taskId);
+  if (!task || !taskCtx) {
+    return null;
+  }
   const messageCtx = useContext(MessageContext);
+
+  const utils = trpc.useContext();
   const updateTask = trpc.tasks.updateTask.useMutation({
     async onSuccess() {
       utils.tasks.invalidate();
@@ -39,6 +39,11 @@ export const TaskForm = (props: TaskFormProps) => {
         title: "Success",
         text: "Task successfully updated!",
       });
+    },
+  });
+  const addLink = trpc.tasks.addLink.useMutation({
+    async onSuccess() {
+      utils.tasks.invalidate();
     },
   });
 
@@ -73,13 +78,12 @@ export const TaskForm = (props: TaskFormProps) => {
       switch (element.name) {
         case "statusId":
           return (
-            props.statusArray.find((s) => s.id === props.task.statusId)?.name ??
-            ""
+            taskCtx?.statuses?.find((s) => s.id === task.statusId)?.name ?? ""
           );
         case "description":
-          return props.task.description ?? "";
+          return task.description ?? "";
         case "name":
-          return props.task.name;
+          return task.name;
       }
     };
 
@@ -91,11 +95,11 @@ export const TaskForm = (props: TaskFormProps) => {
     const form = event.currentTarget;
 
     const statusId =
-      props.statusArray.find((s) => s.name === form.statusId.value)?.id ?? 0;
+      taskCtx?.statuses?.find((s) => s.name === form.statusId.value)?.id ?? 0;
 
     updateTask
       .mutateAsync({
-        where: { id: props.task.id },
+        where: { id: task.id },
         data: {
           name: form.name.value,
           statusId: statusId,
@@ -125,7 +129,7 @@ export const TaskForm = (props: TaskFormProps) => {
       <div className="h-full w-full rounded-xl bg-surface">
         <TabContainer
           hidden={!props.expanded}
-          tabs={[props.task.name, "Relations"]}
+          tabs={[task.name, "Relations"]}
           onTabChange={setOpenTabIndex}
         />
 
@@ -142,7 +146,7 @@ export const TaskForm = (props: TaskFormProps) => {
                   name="name"
                   autoFocus
                   type="text"
-                  defaultValue={props.task.name}
+                  defaultValue={task.name}
                   required={true}
                   disabled={isBeingDeleted}
                   onChange={handleOnChange}
@@ -154,14 +158,14 @@ export const TaskForm = (props: TaskFormProps) => {
                 <select
                   name="statusId"
                   defaultValue={
-                    props.statusArray.find((s) => s.id === props.task.statusId)
+                    taskCtx?.statuses?.find((s) => s.id === task.statusId)
                       ?.name ?? 0
                   }
                   disabled={isBeingDeleted}
                   onChange={handleOnChange}
                   className="w-full rounded border border-transparent border-b-outline bg-transparent px-1 text-base capitalize data-[edited=true]:border-tetriary"
                 >
-                  {props.statusArray.map((status) => {
+                  {taskCtx?.statuses?.map((status) => {
                     return (
                       <option key={status.id.toString()}>{status.name}</option>
                     );
@@ -175,7 +179,7 @@ export const TaskForm = (props: TaskFormProps) => {
                       Created at:
                     </summary>
                     <div className="px-2 text-sm">
-                      {props.task.createdAt.toLocaleString()}
+                      {task.createdAt.toLocaleString()}
                     </div>
                   </details>
                   <details className="col-span-3 md:col-span-1">
@@ -183,7 +187,7 @@ export const TaskForm = (props: TaskFormProps) => {
                       Updated at:
                     </summary>
                     <div className="px-2 text-sm">
-                      {props.task.updatedAt.toLocaleString()}
+                      {task.updatedAt.toLocaleString()}
                     </div>
                   </details>
                   <input
@@ -204,7 +208,7 @@ export const TaskForm = (props: TaskFormProps) => {
                   Description:
                   <textarea
                     name="description"
-                    defaultValue={props.task.description ?? ""}
+                    defaultValue={task.description ?? ""}
                     disabled={isBeingDeleted}
                     onChange={handleOnChange}
                     className="mt-2 h-full w-full rounded border border-outline bg-transparent p-2 text-base focus:border-primary data-[edited=true]:border-tetriary"
@@ -224,7 +228,7 @@ export const TaskForm = (props: TaskFormProps) => {
                     disabled={isBeingDeleted}
                     onClick={() => {
                       setIsBeingDeleted(true);
-                      deleteTask.mutate({ where: { id: props.task.id } });
+                      deleteTask.mutate({ where: { id: task.id } });
                     }}
                   />
                   <input
@@ -241,7 +245,7 @@ export const TaskForm = (props: TaskFormProps) => {
                 className="mt-2 place-self-center self-end rounded-xl bg-primary p-1.5 text-primary-text transition-all ease-linear hover:rounded-lg hover:bg-primary-container-text enabled:hover:cursor-pointer disabled:text-secondary"
                 disabled={isBeingDeleted}
                 onClick={() => {
-                  props.setExpandedTaskId(props.task.id);
+                  props.setExpandedTaskId(task.id);
                 }}
               >
                 <MdEdit />
@@ -255,11 +259,11 @@ export const TaskForm = (props: TaskFormProps) => {
             <div className="flex w-full flex-col items-center rounded-xl p-2">
               <div className="flex w-full px-1 text-xl leading-6">
                 <strong className="w-full">Parent tasks</strong>
-                <strong>{props.task.childOf.length}</strong>
+                <strong>{task.childOf.length}</strong>
               </div>
               <div className="mt-2 mb-4 w-full rounded-full border-y border-outline/50" />
               <ul className="w-fit list-inside list-disc marker:text-primary hover:marker:text-primary-container-text">
-                {props.task.childOf.map((link) => {
+                {task.childOf.map((link) => {
                   return (
                     <li
                       key={link.parent.id}
@@ -276,22 +280,79 @@ export const TaskForm = (props: TaskFormProps) => {
             <div className="flex w-full flex-col items-center rounded-xl p-2">
               <div className="flex w-full px-1 text-xl leading-6">
                 <strong className="w-full">Child tasks</strong>
-                <strong>{props.task.parentOf.length}</strong>
+                <strong>{task.parentOf.length}</strong>
               </div>
               <div className="mt-2 mb-4 w-full rounded-full border-y border-outline/50" />
               <ul className="w-fit list-outside list-disc marker:text-primary hover:marker:text-primary-container-text">
-                {props.task.parentOf.map((link) => {
+                {task.parentOf.map((link) => {
                   return (
                     <li
                       key={link.child.id}
-                      className="rounded border border-outline p-1 text-sm hover:cursor-pointer hover:border-primary"
-                      onClick={() => props.setExpandedTaskId(link.child.id)}
+                      className="group/item mb-4 flex w-full gap-2 rounded-xl border-b border-outline bg-surface-text/5 p-2 transition-all hover:-translate-x-1 hover:border-b-primary"
                     >
-                      {link.child.name}{" "}
-                      <span className="lowercase">{link.type}</span> this
+                      <form
+                        className="flex w-full gap-2"
+                        onBlur={(e) => e.currentTarget.reset()}
+                      >
+                        <input
+                          name="linkTask"
+                          type="text"
+                          defaultValue={link.child.name}
+                          className="w-full flex-grow rounded border border-transparent bg-inherit transition-colors ease-linear invalid:border-error"
+                        />
+                        <input
+                          name="linkType"
+                          type="text"
+                          defaultValue={link.type}
+                          className="w-full flex-grow rounded border border-transparent bg-inherit transition-colors ease-linear invalid:border-error"
+                        />
+                        <input
+                          type="button"
+                          value="x"
+                          className="font-mono text-error opacity-0 transition-all ease-linear hover:cursor-pointer group-hover/item:opacity-100"
+                          onClick={() => {}}
+                        />
+                      </form>
                     </li>
                   );
                 })}
+                <li
+                  key="NEW"
+                  className="mb-4 flex rounded-xl border-b border-outline bg-surface-text/5 hover:border-b-tetriary"
+                >
+                  <form
+                    className="p-2 w-full"
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                    }}
+                  >
+                    <CompletableInput
+                      className="w-full flex-grow rounded border border-transparent bg-inherit"
+                      source={taskCtx.tasks.filter((t) => t.id != task.id)}
+                      predicate={(value, input) => {
+                        const resId = fuzzySearch(`${value.id}`, input);
+                        if (resId > 0.25) {
+                          return true;
+                        }
+                        const res = fuzzySearch(`${value.name}`, input);
+                        return res > 0.25;
+                      }}
+                      sort={(lhs, rhs, input) =>
+                        fuzzySearch(`${lhs.id} : ${lhs.name}`, input) -
+                        fuzzySearch(`${rhs.id} : ${rhs.name}`, input)
+                      }
+                      itemToString={(value) => `${value.id} : ${value.name}`}
+                      onSubmit={(_, value) => {
+                        if (!value) return;
+                        addLink.mutate({
+                          type: "Depends on",
+                          parentId: task.id,
+                          childId: value.id,
+                        });
+                      }}
+                    />
+                  </form>
+                </li>
               </ul>
             </div>
           </div>

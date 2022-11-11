@@ -1,20 +1,14 @@
 import type { NextPage } from "next";
-
 import Image from "next/future/image";
 import Head from "next/head";
-
-import { trpc } from "@/utils/trpc";
 
 import { Dashboard } from "@/components/Dashboard";
 import { TaskBoard } from "@/components/TaskBoard";
 import Toast, { Message, MessageContext } from "@/components/Toast";
 import { useState } from "react";
+import React from "react";
 
 const Home: NextPage = () => {
-  const { data, isLoading } = trpc.tasks.getAllStatuses.useQuery({
-    includeTasks: true,
-  });
-
   const [messageList, setMessageList] = useState<Message[]>([]);
   const addMessage = (message: Message) => {
     const timeout = setTimeout(() => {
@@ -29,8 +23,8 @@ const Home: NextPage = () => {
   };
   const dismissMessage = (message: Message) => {
     clearTimeout(message.timeout);
-    setMessageList(list => list.filter(m => m.id !== message.id))
-  }
+    setMessageList((list) => list.filter((m) => m.id !== message.id));
+  };
 
   return (
     <>
@@ -44,7 +38,7 @@ const Home: NextPage = () => {
           <div>
             <Dashboard />
           </div>
-          {isLoading || !data ? "Loading..." : <TaskBoard statusArray={data} />}
+          <TaskBoard />
           <a
             href="https://github.com/LeBulldoge/task-manager"
             className="group fixed bottom-0 right-0 flex gap-1 place-self-end pr-3 pb-1 text-xs hover:underline"
